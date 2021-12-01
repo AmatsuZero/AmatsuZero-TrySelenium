@@ -29,6 +29,22 @@ export default class NewListPage {
     const path = `${SISPaths.NEW}-${this.currentPage}.html`;
     return new URL(path, this.host).href;
   }
+
+  async getAllThreadLinks() {
+    if (this.driver === undefined) {
+      this.driver = await makeSafariBrowser();
+    }
+    if (this.maxPage === -1) {
+      await this.findMaxPage()
+    }
+    const hrefs: Set<string> = [];
+    while (this.currentPage <= this.maxPage) {
+      
+      this.driver.sleep(100);
+      await this.nextPage();
+    }
+    return hrefs;
+  }
   
   async getAllThreadsOnCurrentPage() {
     if (this.driver === undefined) {
@@ -51,7 +67,14 @@ export default class NewListPage {
     return extractLinks(elms);
   }
 
-  async newPage() {
+  async nextPage() {
+    if (this.driver === undefined || this.currentPage >= this.maxPage) {
+      return
+    }
+    // 找到下一个按钮，并点击
+    const pageBtns = await this.driver.findElement(By.className("pages_btns"));
+    const newxBtn = await pageBtns.findElement(By.className("next"));
+    await newxBtn.click();
     this.currentPage += 1;
   }
 
