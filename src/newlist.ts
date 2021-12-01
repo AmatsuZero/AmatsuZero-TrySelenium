@@ -31,19 +31,18 @@ export default class NewListPage {
   }
 
   async getAllThreadLinks() {
-    if (this.driver === undefined) {
-      this.driver = await makeSafariBrowser();
-    }
-    if (this.maxPage === -1) {
-      await this.findMaxPage()
-    }
-    const hrefs: Set<string> = [];
-    while (this.currentPage <= this.maxPage) {
-      
-      this.driver.sleep(100);
-      await this.nextPage();
-    }
-    return hrefs;
+    let hrefs: string[] = [];
+    do {
+      try {
+        const links = await this.getAllThreadsOnCurrentPage();
+        hrefs = hrefs.concat(links);
+        // this.driver.sleep(300); // 防止频率过高
+        await this.nextPage();
+      } catch (e) {
+        console.error(e);
+      }
+    } while (this.currentPage <= this.maxPage) 
+    return [...new Set(hrefs)];
   }
   
   async getAllThreadsOnCurrentPage() {
@@ -53,6 +52,7 @@ export default class NewListPage {
     const url = this.currentPageURL();
     let elms: WebElement[] = [];
     try {
+      console.log(`🔗即将访问：${url}`);
       await this.driver.get(url);
       if (this.maxPage === -1) {
         await this.findMaxPage()

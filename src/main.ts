@@ -8,6 +8,6 @@ import { findAvailableHost } from './util';
     return;
   }
   const newListPage = new NewListPage(host);
-  const hrefs = await newListPage.getAllThreadsOnCurrentPage();
+  const hrefs = await newListPage.getAllThreadLinks();
   console.log(hrefs);
 })();
