@@ -2,8 +2,13 @@ import {
   Browser,
   Builder,
 } from 'selenium-webdriver';
-import chrome from "selenium-webdriver/chrome";
+import {
+  ServiceBuilder,
+  Options,
+} from "selenium-webdriver/chrome";
 import { URL } from 'url';
+import path from 'path';
+import os from 'os';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 
@@ -23,14 +28,23 @@ const hosts = [
   "http://154.84.5.249/",
   "http://154.84.5.211/",
   "http://162.252.9.2/"
-]
+];
 
 const makeBrowser = async () => {
-  const options = new chrome.Options();
+  const options = new Options();
   options.addArguments("--headless"); // 创建无头浏览器
-  return await new Builder().forBrowser(Browser.CHROME)
-  .setChromeOptions(options)
-  .build();
+  const builder = new Builder().forBrowser(Browser.CHROME);
+  if(os.platform() === 'linux') {// linux 需要指定 driver 位置
+    const location = path.join(__dirname, "..", "env/linux", "chromedriver");
+    const serviceBuilder = new ServiceBuilder(location);
+    builder.setChromeService(serviceBuilder);
+
+    // 额外设置
+    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--disable-gpu'");
+    options.addArguments("--no-sandbox");
+  }
+  return await builder.setChromeOptions(options).build();
 }
 
 const findAvailableHost = async () => {
