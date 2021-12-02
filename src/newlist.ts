@@ -36,7 +36,6 @@ export default class NewListPage {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
         hrefs = hrefs.concat(links);
-        // this.driver.sleep(300); // 防止频率过高
         await this.nextPage();
       } catch (e) {
         console.error(e);
