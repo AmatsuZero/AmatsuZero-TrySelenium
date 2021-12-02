@@ -2,6 +2,7 @@ import {
   Browser,
   Builder,
 } from 'selenium-webdriver';
+import chrome from "selenium-webdriver/chrome";
 import { URL } from 'url';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
@@ -24,12 +25,18 @@ const hosts = [
   "http://162.252.9.2/"
 ]
 
-const makeSafariBrowser = async () => await new Builder().forBrowser(Browser.SAFARI).build();
+const makeBrowser = async () => {
+  const options = new chrome.Options();
+  options.addArguments("--headless"); // 创建无头浏览器
+  return await new Builder().forBrowser(Browser.CHROME)
+  .setChromeOptions(options)
+  .build();
+}
 
 const findAvailableHost = async () => {
   let expectedHost = '';
   for (const host of hosts) {
-    const driver = await makeSafariBrowser();
+    const driver = await makeBrowser();
     try {
       const bbs = new URL(SISPaths.INDEX, host)
       await driver.get(bbs.href);
@@ -48,7 +55,7 @@ const findAvailableHost = async () => {
 }
 
 export {
-  makeSafariBrowser,
+  makeBrowser,
   findAvailableHost,
   SISPaths,
   PageCode

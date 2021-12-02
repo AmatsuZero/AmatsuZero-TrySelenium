@@ -1,6 +1,23 @@
-import { By } from "selenium-webdriver";
+import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
-import { makeSafariBrowser } from "./util";
+import { makeBrowser } from "./util";
+
+const findTorrentLink = async (driver: WebDriver) => {
+  const links = await driver.findElements(By.xpath("//a"));
+  for (const link of links) {
+    const str = await link.getAttribute("href");
+    if (str === null || str === undefined || str.length === 0) {
+      continue;
+    }
+    const url = new URL(str);
+    if (url !== undefined && url.pathname === "/bbs/attachment.php") {
+      await driver.get(url.href); // 跳转到下载中心
+      const href = await driver.findElement(By.xpath('//*[@id="downloadBtn"]'));
+      return await href.getAttribute("href");
+    }
+  }
+  return '';
+}
 
 export default class DetailPage {
   public href: string;
@@ -10,12 +27,14 @@ export default class DetailPage {
   }
 
   public async extractInfo() {
-    const driver = await makeSafariBrowser();
+    const driver = await makeBrowser();
     try {
       await driver.get(this.href);
       const msgFont = await driver.findElement(By.className("t_msgfont"));
       const detail = new InfoModel(msgFont, this.threadId());
+      detail.category = "new";
       await detail.build();
+      detail.torrentLink = await findTorrentLink(driver); // 提取种子链接
       return detail;
     } catch (e) {
       console.error(e);

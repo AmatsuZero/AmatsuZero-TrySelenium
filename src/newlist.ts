@@ -1,6 +1,6 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { URL } from "url";
-import { makeSafariBrowser, PageCode, SISPaths } from "./util";
+import { makeBrowser, PageCode, SISPaths } from "./util";
 
 
 const extractLinks = async (elms: WebElement[]) => {
@@ -20,29 +20,28 @@ export default class NewListPage {
   public currentPage = 1;
   public host: string;
   public maxPage = -1;
-  private driver?: WebDriver;
+  public driver?: WebDriver;
 
   public constructor(host: string) {
     this.host = host;
   }
 
-  public async getAllThreadLinks() {
-    let hrefs: string[] = [];
+  public async getAllThreadLinks(block: (hrefs: string[]) => Promise<void>) {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
-        hrefs = hrefs.concat(links);
+        await block(links);
         await this.nextPage();
       } catch (e) {
         console.error(e);
       }
     } while (this.currentPage <= this.maxPage)
-    return [...new Set(hrefs)];
+    this.destroy();
   }
 
-  public async getAllThreadsOnCurrentPage() {
+  public async getAllThreadsOnCurrentPage(needClose = false) {
     if (this.driver === undefined) {
-      this.driver = await makeSafariBrowser();
+      this.driver = await makeBrowser();
     }
     const url = this.currentPageURL();
     let elms: WebElement[] = [];
@@ -59,6 +58,9 @@ export default class NewListPage {
     } catch (e) {
       console.error(e);
     }
+    if (needClose) {
+      this.destroy();
+    }
     return extractLinks(elms);
   }
 
@@ -69,6 +71,7 @@ export default class NewListPage {
 
   private async nextPage() {
     if (this.driver === undefined || this.currentPage >= this.maxPage) {
+      this.destroy();
       return
     }
     // 找到下一个按钮，并点击
@@ -88,5 +91,13 @@ export default class NewListPage {
     link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
     link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
     this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
+  }
+
+  private async destroy() {
+    if (this.driver === undefined) {
+      return
+    }
+    await this.driver.close();
+    this.driver = undefined;
   }
 }

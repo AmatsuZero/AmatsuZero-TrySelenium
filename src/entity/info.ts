@@ -30,6 +30,12 @@ class InfoModel {
   @Column("simple-array")
   public thumbnails: string[] = [];
 
+  @Column("text")
+  public torrentLink = "";
+
+  @Column("text")
+  public category = "unknown";
+
   private sourceElment: WebElement;
 
   public constructor(elm: WebElement, id: number) {
@@ -41,11 +47,10 @@ class InfoModel {
   public async build() {
     const postId = await this.sourceElment.getAttribute("id");
     this.postId = postId.split("_")[1]; // 获取 post id
-    const lines = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]/text()`));
+    const lines = await (await this.sourceElment.getText()).split("\n");
     const separator = "：";
     // 提取信息
-    for (const value of lines) {
-      const str = await value.getText();
+    for (const str of lines) {
       if (str.includes("影片名稱")) {
         this.title = str.split(separator)[1];
       } else if (str.includes("影片格式")) {
