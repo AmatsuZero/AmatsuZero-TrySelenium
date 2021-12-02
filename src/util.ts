@@ -2,6 +2,7 @@ import {
   Browser,
   Builder,
 } from 'selenium-webdriver';
+import { URL } from 'url';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 

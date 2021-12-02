@@ -1,9 +1,9 @@
 import { By } from "selenium-webdriver";
-import { InfoModel } from "./info";
+import { InfoModel } from "./entity/info";
 import { makeSafariBrowser } from "./util";
 
 export default class DetailPage {
-  href: string
+  href: string;
 
   constructor(href: string) {
     this.href = href;

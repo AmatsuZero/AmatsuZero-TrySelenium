@@ -1,20 +1,41 @@
 import { By, WebElement } from "selenium-webdriver";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+@Entity()
 class InfoModel {
-  sourceElment: WebElement
-  threadId: number
-  title = ""
-  actors: string[] = []
-  format = ""
-  postId = ""
-  size = ""
-  isBlurred = true
-  sig = ""
-  thumbnails: string[] = []
+  sourceElment: WebElement;
+  
+  @PrimaryColumn()
+  threadId: number;
+
+  @Column("text")
+  title = "";
+
+  @Column("simple-array")
+  actors: string[] = [];
+
+  @Column("text")
+  format = "";
+
+  @Column("text")
+  postId = "";
+
+  @Column("text")
+  size = "";
+
+  @Column()
+  isBlurred: boolean;
+
+  @Column("text")
+  sig = "";
+
+  @Column("simple-array")
+  thumbnails: string[] = [];
 
   constructor(elm: WebElement, id: number) {
     this.sourceElment = elm;
     this.threadId = id;
+    this.isBlurred = true;
   }
 
   async build() {
@@ -38,7 +59,8 @@ class InfoModel {
       } else if (str.includes("特徵碼")) {
         this.sig = str.split(separator)[1];
       } else if (str.includes("出演女優")) {
-        this.actors = str.split(",");
+        const value = str.split(separator)[1];
+        this.actors = value.length > 0 ? value.split(",") : [];
       }
     }
     // 提取预览图链接
@@ -51,33 +73,9 @@ class InfoModel {
     }
   }
 
-  static schema() {
-    return {
-      name: "VideoInfo",
-      properties: {
-        _id: "int",
-        name: "string",
-        actors: {
-          type: "list",
-          objectType: "string",
-          optional: true,
-        },
-        format: "string",
-        size: "string",
-        duration: "string",
-        thumbnails: {
-          type: "list",
-          objectType: "string",
-          optional: true,
-        }
-      },
-      primaryKey: "_id",
-    };
-  }
-
   toString() {
     return `---- thread id: ${this.threadId} ---- 
-    【影片名稱】：${this.title}
+    【影片名稱】：${this.title}  
     【出演女優】：${this.actors.join("，")}
     【影片格式】：${this.format}
     【影片大小】：${this.size}
@@ -86,7 +84,7 @@ class InfoModel {
     【影片預覽】：图片较大请等待，看不到图请使用代理。
     ${this.thumbnails.join("\n")}
     ---- post id: ${this.postId} ----
-    `
+    `;
   }
 }
 

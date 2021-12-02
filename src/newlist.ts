@@ -1,4 +1,5 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
+import { URL } from "url";
 import { makeSafariBrowser, PageCode, SISPaths } from "./util";
 
 
@@ -16,10 +17,10 @@ const extractLinks = async (elms: WebElement[]) => {
 }
 
 export default class NewListPage {
-  currentPage = 1
+  currentPage = 1;
   driver?: WebDriver;
   host: string;
-  maxPage = -1
+  maxPage = -1;
 
   constructor(host: string) {
     this.host = host;

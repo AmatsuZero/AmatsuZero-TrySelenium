@@ -1,19 +1,21 @@
+import { By } from 'selenium-webdriver';
+import { createConnection } from "typeorm";
 import DetailPage from './detail';
+import { InfoModel } from './entity/info';
 import NewListPage from './newlist';
-import { findAvailableHost } from './util';
+import { findAvailableHost, makeSafariBrowser } from './util';
 
 (async () => {
-  // const host = await findAvailableHost();
-  // if (host.length === 0) {
-  //   console.log('没有可以访问的域名');
-  //   return;
-  // }
-  // http://162.252.9.2/bbs/thread-11174550-1-1.html
-  // const newListPage = new NewListPage(host);
-  // const hrefs = await newListPage.getAllThreadLinks();
-  // console.log(hrefs);
-
-  const detail = new DetailPage("http://162.252.9.2/bbs/thread-11174550-1-1.html");
-  const info = await detail.extractInfo();
-  console.log(info);
+  try {
+    const connection = await createConnection();
+    const detail = new DetailPage("http://162.252.9.2/bbs/thread-11174550-1-1.html");
+    const info = await detail.extractInfo();
+    console.log(info);
+    await connection.manager.save(info);
+  
+    const posts = await connection.manager.find(InfoModel);
+    console.log("Loaded posts: ", posts);
+  } catch (e) {
+    console.error(e);
+  }
 })();
