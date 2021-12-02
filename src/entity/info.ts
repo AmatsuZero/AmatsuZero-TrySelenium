@@ -3,42 +3,42 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 class InfoModel {
-  sourceElment: WebElement;
-  
   @PrimaryColumn()
-  threadId: number;
+  public threadId: number;
 
   @Column("text")
-  title = "";
+  public title = "";
 
   @Column("simple-array")
-  actors: string[] = [];
+  public actors: string[] = [];
 
   @Column("text")
-  format = "";
+  public format = "";
 
   @Column("text")
-  postId = "";
+  public postId = "";
 
   @Column("text")
-  size = "";
+  public size = "";
 
   @Column()
-  isBlurred: boolean;
+  public isBlurred: boolean;
 
   @Column("text")
-  sig = "";
+  public sig = "";
 
   @Column("simple-array")
-  thumbnails: string[] = [];
+  public thumbnails: string[] = [];
 
-  constructor(elm: WebElement, id: number) {
+  private sourceElment: WebElement;
+
+  public constructor(elm: WebElement, id: number) {
     this.sourceElment = elm;
     this.threadId = id;
     this.isBlurred = true;
   }
 
-  async build() {
+  public async build() {
     const postId = await this.sourceElment.getAttribute("id");
     this.postId = postId.split("_")[1]; // 获取 post id
     const lines = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]/text()`));
@@ -73,7 +73,7 @@ class InfoModel {
     }
   }
 
-  toString() {
+  public toString() {
     return `---- thread id: ${this.threadId} ---- 
     【影片名稱】：${this.title}  
     【出演女優】：${this.actors.join("，")}

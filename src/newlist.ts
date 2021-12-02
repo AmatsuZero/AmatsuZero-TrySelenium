@@ -17,21 +17,16 @@ const extractLinks = async (elms: WebElement[]) => {
 }
 
 export default class NewListPage {
-  currentPage = 1;
-  driver?: WebDriver;
-  host: string;
-  maxPage = -1;
+  public currentPage = 1;
+  public host: string;
+  public maxPage = -1;
+  private driver?: WebDriver;
 
-  constructor(host: string) {
+  public constructor(host: string) {
     this.host = host;
   }
 
-  currentPageURL() {
-    const path = `${SISPaths.NEW}-${this.currentPage}.html`;
-    return new URL(path, this.host).href;
-  }
-
-  async getAllThreadLinks() {
+  public async getAllThreadLinks() {
     let hrefs: string[] = [];
     do {
       try {
@@ -41,11 +36,11 @@ export default class NewListPage {
       } catch (e) {
         console.error(e);
       }
-    } while (this.currentPage <= this.maxPage) 
+    } while (this.currentPage <= this.maxPage)
     return [...new Set(hrefs)];
   }
-  
-  async getAllThreadsOnCurrentPage() {
+
+  public async getAllThreadsOnCurrentPage() {
     if (this.driver === undefined) {
       this.driver = await makeSafariBrowser();
     }
@@ -67,7 +62,12 @@ export default class NewListPage {
     return extractLinks(elms);
   }
 
-  async nextPage() {
+  private currentPageURL() {
+    const path = `${SISPaths.NEW}-${this.currentPage}.html`;
+    return new URL(path, this.host).href;
+  }
+
+  private async nextPage() {
     if (this.driver === undefined || this.currentPage >= this.maxPage) {
       return
     }
@@ -78,7 +78,7 @@ export default class NewListPage {
     this.currentPage += 1;
   }
 
-  async findMaxPage() {
+  private async findMaxPage() {
     if (this.driver === undefined) {
       return
     }
@@ -87,6 +87,6 @@ export default class NewListPage {
     let link = await last.getAttribute("href");
     link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
     link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
-    this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1]);
+    this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
   }
 }

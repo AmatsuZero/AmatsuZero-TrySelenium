@@ -33,16 +33,16 @@ const findAvailableHost = async () => {
     try {
       const bbs = new URL(SISPaths.INDEX, host)
       await driver.get(bbs.href);
-        const title = await driver.getTitle();
-        if (title === expectedTitle) {
-          expectedHost = host;
-          break;
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        await driver.quit();
+      const title = await driver.getTitle();
+      if (title === expectedTitle) {
+        expectedHost = host;
+        break;
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      await driver.quit();
+    }
   }
   return expectedHost;
 }
