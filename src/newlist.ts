@@ -1,6 +1,6 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { URL } from "url";
-import { makeBrowser, PageCode, SISPaths } from "./util";
+import { Logger, makeBrowser, PageCode, SISPaths } from "./util";
 
 
 const extractLinks = async (elms: WebElement[]) => {
@@ -33,7 +33,8 @@ export default class NewListPage {
         await block(links);
         await this.nextPage();
       } catch (e) {
-        console.error(e);
+        Logger.log("❌ 提取新作品页面出错了");
+        Logger.error(e);
       }
     } while (this.currentPage <= this.maxPage)
     this.destroy();
@@ -46,7 +47,7 @@ export default class NewListPage {
     const url = this.currentPageURL();
     let elms: WebElement[] = [];
     try {
-      console.log(`🔗即将访问：${url}`);
+      Logger.log(`🔗 即将打开新作品第${this.currentPage}页：${url}`);
       await this.driver.get(url);
       if (this.maxPage === -1) {
         await this.findMaxPage()
@@ -56,7 +57,8 @@ export default class NewListPage {
       parent = await parent.findElement(By.xpath(`//*[@id='${id}']`));
       elms = await parent.findElements(By.xpath("//tbody"));
     } catch (e) {
-      console.error(e);
+      Logger.log(`❌ 解析详情失败：${url}`);
+      Logger.error(e);
     }
     if (needClose) {
       this.destroy();
@@ -74,23 +76,35 @@ export default class NewListPage {
       this.destroy();
       return
     }
-    // 找到下一个按钮，并点击
-    const pageBtns = await this.driver.findElement(By.className("pages_btns"));
-    const newxBtn = await pageBtns.findElement(By.className("next"));
-    await newxBtn.click();
-    this.currentPage += 1;
+    try {
+      // 找到下一个按钮，并点击
+      const pageBtns = await this.driver.findElement(By.className("pages_btns"));
+      const newxBtn = await pageBtns.findElement(By.className("next"));
+      await newxBtn.click();
+      this.currentPage += 1;
+      Logger.log("🏃 进入到下一页");
+    } catch (e) {
+      Logger.log(`❌ 进入到下一页失败，当前页面：${this.currentPage}`);
+      Logger.error(e);
+    }
   }
 
   private async findMaxPage() {
     if (this.driver === undefined) {
       return
     }
-    const pageBtns = await this.driver.findElement(By.className("pages_btns"));
-    const last = await pageBtns.findElement(By.className("last"));
-    let link = await last.getAttribute("href");
-    link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
-    link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
-    this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
+    try {
+      const pageBtns = await this.driver.findElement(By.className("pages_btns"));
+      const last = await pageBtns.findElement(By.className("last"));
+      let link = await last.getAttribute("href");
+      link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
+      link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
+      this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
+      Logger.log(`📖 新作品一共${this.maxPage}页`);
+    } catch (e) {
+      Logger.log('❌ 查找最大页面失败');
+      Logger.error(e);
+    }
   }
 
   private async destroy() {

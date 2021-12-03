@@ -8,7 +8,9 @@ import {
 } from "selenium-webdriver/chrome";
 import { URL } from 'url';
 import path from 'path';
+import fs from "fs";
 import os from 'os';
+import { Console } from 'console';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 
@@ -68,9 +70,21 @@ const findAvailableHost = async () => {
   return expectedHost;
 }
 
+const ws = fs.createWriteStream(path.join(__dirname, '..', 'log.txt'), {
+  flags:'w', // 文件的打开模式
+  mode:0o666, // 文件的权限设置
+  encoding:'utf8', // 写入文件的字符的编码
+  highWaterMark:3, // 最高水位线
+  start:0, // 写入文件的起始索引位置        
+  autoClose:true, // 是否自动关闭文档
+})
+
+const Logger = new Console(ws, ws);
+
 export {
   makeBrowser,
   findAvailableHost,
   SISPaths,
-  PageCode
+  PageCode,
+  Logger,
 }

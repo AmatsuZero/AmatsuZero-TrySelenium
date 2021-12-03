@@ -1,9 +1,10 @@
 import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
-import { makeBrowser } from "./util";
+import { makeBrowser, Logger } from "./util";
 
 const findTorrentLink = async (driver: WebDriver) => {
   const links = await driver.findElements(By.xpath("//a"));
+  let addr = '';
   for (const link of links) {
     const str = await link.getAttribute("href");
     if (str === null || str === undefined || str.length === 0) {
@@ -11,12 +12,19 @@ const findTorrentLink = async (driver: WebDriver) => {
     }
     const url = new URL(str);
     if (url !== undefined && url.pathname === "/bbs/attachment.php") {
-      await driver.get(url.href); // 跳转到下载中心
-      const href = await driver.findElement(By.xpath('//*[@id="downloadBtn"]'));
-      return await href.getAttribute("href");
+      try {
+        await driver.get(url.href); // 跳转到下载中心
+        Logger.log(`🔗 即将提取种子链接: ${url.href}`);
+        const href = await driver.findElement(By.xpath('//*[@id="downloadBtn"]'));
+        addr = await href.getAttribute("href");
+        break;
+      } catch(e) {
+        Logger.log(`❌ 提取下载链接失败：${url.href}`);
+        Logger.error(e);
+      }
     }
   }
-  return '';
+  return addr;
 }
 
 export default class DetailPage {
@@ -37,7 +45,8 @@ export default class DetailPage {
       detail.torrentLink = await findTorrentLink(driver); // 提取种子链接
       return detail;
     } catch (e) {
-      console.error(e);
+      Logger.log(`❌ 提取页面信息失败: ${this.href}`);
+      Logger.error(e);
     } finally {
       await driver.close();
     }

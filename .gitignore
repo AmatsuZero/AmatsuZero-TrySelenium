@@ -106,3 +106,5 @@ dist
 dist/
 build/
 data/
+env/linux/chromedriver
+log.txt
