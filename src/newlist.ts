@@ -28,6 +28,13 @@ export default class NewListPage {
     this.host = host;
     this.latestId = latestId;
     this.earliestid = earliestid;
+    // 检查起始页码
+    for (const arg of process.argv) {
+      if (arg.startsWith("start")) {
+        this.currentPage = parseInt(arg.split("=")[1], 10);
+        break;
+      }
+    }
   }
 
   public async getAllThreadLinks(block: (hrefs: string[]) => Promise<void>) {
