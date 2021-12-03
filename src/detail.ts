@@ -2,6 +2,8 @@ import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
 import { makeBrowser, Logger } from "./util";
 
+const MaxRetryCount = 3;
+
 const findTorrentLink = async (driver: WebDriver) => {
   const links = await driver.findElements(By.xpath("//a"));
   let addr = '';
@@ -29,6 +31,7 @@ const findTorrentLink = async (driver: WebDriver) => {
 
 export default class DetailPage {
   public href: string;
+  private retryCount = 0;
 
   public constructor(href: string) {
     this.href = href;
@@ -45,8 +48,16 @@ export default class DetailPage {
       detail.torrentLink = await findTorrentLink(driver); // 提取种子链接
       return detail;
     } catch (e) {
-      Logger.log(`❌ 提取页面信息失败: ${this.href}`);
-      Logger.error(e);
+      const info = e as { name: string };
+      if (info.name === "NoSuchElementError" && this.retryCount < MaxRetryCount) {
+        this.retryCount += 1;
+        Logger.log(`❌ 提取页面信息失败, 第 ${this.retryCount} 次重试: ${this.href}`);
+        driver.sleep(1000); // sleep 1s 后重试
+        this.extractInfo();
+      } else {
+        Logger.log(`❌ 提取页面信息失败: ${this.href}`);
+        Logger.error(e);
+      }
     } finally {
       await driver.close();
     }

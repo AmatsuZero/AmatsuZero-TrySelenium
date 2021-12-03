@@ -11,6 +11,7 @@ import path from 'path';
 import fs from "fs";
 import os from 'os';
 import { Console } from 'console';
+import process from 'process';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 
@@ -80,6 +81,36 @@ const ws = fs.createWriteStream(path.join(__dirname, '..', 'log.txt'), {
 })
 
 const Logger = new Console(ws, ws);
+
+process.stdin.resume();// so the program will not close instantly
+
+// do something when app is closing
+process.on('exit', () => {
+  Logger.log(`🔚 程序结束：${new Date().toLocaleString('zh-CN')}`);
+});
+
+// catches ctrl+c event
+process.on('SIGINT', (code) => {
+  Logger.error(`❌ 程序强制结束, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+  process.exit();
+});
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', (code) => {
+  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+  process.exit();
+});
+process.on('SIGUSR2',  (code) => {
+  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+  process.exit();
+});
+
+// catches uncaught exceptions
+process.on('uncaughtException',   (error, origin) => {
+  Logger.log(`❌ 程序异常终止， 来源是${origin}：${new Date().toLocaleString('zh-CN')}`);
+  Logger.error(error);
+  process.exit();
+});
 
 export {
   makeBrowser,

@@ -32,6 +32,7 @@ const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
       Logger.error('❌ 没有可以访问的域名', -1);
     } else {
       Logger.log(`☁️ 使用域名为：${host}`);
+      Logger.log('✨ 开始解析新作品列表');
       const newListPage = new NewListPage(host);
       await newListPage.getAllThreadLinks(async (hrefs) => parseNewlistData(connection, hrefs));
     }
@@ -39,6 +40,7 @@ const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');
     Logger.error(e);
   } finally {
+    Logger.log(`🚀 任务结束：${new Date().toLocaleString('zh-CN')}`);
     connection.close();
   }
 })();

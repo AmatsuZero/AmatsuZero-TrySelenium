@@ -50,7 +50,7 @@ export default class NewListPage {
       Logger.log(`🔗 即将打开新作品第${this.currentPage}页：${url}`);
       await this.driver.get(url);
       if (this.maxPage === -1) {
-        await this.findMaxPage()
+        await this.findMaxPage();
       }
       let parent = await this.driver.findElement(By.className("mainbox threadlist"));
       const id = PageCode.NEW.replace("-", "_");
