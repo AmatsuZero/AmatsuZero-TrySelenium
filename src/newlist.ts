@@ -113,7 +113,11 @@ export default class NewListPage {
 
   private threadsFilter(link: string) {
     const id = getThreadId(link);
-    return id > this.latestId || id < this.earliestid;
+    const needParse = id > this.latestId || id < this.earliestid;
+    if (!needParse) {
+      Logger.log(`✈️ 跳过链接：${link}`);
+    }
+    return needParse;
   }
 
   private async destroy() {
