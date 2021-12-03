@@ -27,12 +27,12 @@ const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
 
 const prepareConnection = async () => {
   Logger.log("💻 准备创建数据库链接");
-  const connection = await createConnection();
   const configPath = path.join(__dirname, '..', 'ormconfig.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   const { database } = config;
   const dataBasepath = path.join(__dirname, '..', database);
   const hasHistoryData = fs.existsSync(dataBasepath);
+  const connection = await createConnection();
   return { connection, hasHistoryData };
 };
 
