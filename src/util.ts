@@ -112,9 +112,17 @@ process.on('uncaughtException',   (error, origin) => {
   process.exit();
 });
 
+const getThreadId = (href: string) => {
+  let link = href.substring(href.lastIndexOf('/') + 1); // 获取最后一部分
+  link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
+  const id = link.split("-")[1];
+  return parseInt(id, 10);
+};
+
 export {
   makeBrowser,
   findAvailableHost,
+  getThreadId,
   SISPaths,
   PageCode,
   Logger,

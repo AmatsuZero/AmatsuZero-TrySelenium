@@ -1,6 +1,6 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { URL } from "url";
-import { Logger, makeBrowser, PageCode, SISPaths } from "./util";
+import { getThreadId, Logger, makeBrowser, PageCode, SISPaths } from "./util";
 
 
 const extractLinks = async (elms: WebElement[]) => {
@@ -21,16 +21,20 @@ export default class NewListPage {
   public host: string;
   public maxPage = -1;
   public driver?: WebDriver;
+  public latestId: number;
+  public earliestid: number;
 
-  public constructor(host: string) {
+  public constructor(host: string, latestId: number, earliestid: number) {
     this.host = host;
+    this.latestId = latestId;
+    this.earliestid = earliestid;
   }
 
   public async getAllThreadLinks(block: (hrefs: string[]) => Promise<void>) {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
-        await block(links);
+        await block(links.filter(link => this.threadsFilter(link)));
         await this.nextPage();
       } catch (e) {
         Logger.log("❌ 提取新作品页面出错了");
@@ -105,6 +109,11 @@ export default class NewListPage {
       Logger.log('❌ 查找最大页面失败');
       Logger.error(e);
     }
+  }
+
+  private threadsFilter(link: string) {
+    const id = getThreadId(link);
+    return id > this.latestId || id < this.earliestid;
   }
 
   private async destroy() {

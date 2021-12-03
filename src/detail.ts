@@ -1,6 +1,6 @@
 import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
-import { makeBrowser, Logger } from "./util";
+import { makeBrowser, Logger, getThreadId } from "./util";
 
 const MaxRetryCount = 3;
 
@@ -64,9 +64,6 @@ export default class DetailPage {
   }
 
   private threadId() {
-    let link = this.href.substring(this.href.lastIndexOf('/') + 1); // 获取最后一部分
-    link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
-    const id = link.split("-")[1];
-    return parseInt(id, 10);
+    return getThreadId(this.href);
   }
 }
