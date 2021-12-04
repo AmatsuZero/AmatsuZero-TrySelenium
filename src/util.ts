@@ -45,7 +45,7 @@ const makeBrowser = async () => {
     // 额外设置
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu'");
-    options.addArguments("--no-sandbox");
+    // options.addArguments("--no-sandbox");
   }
   return await builder.setChromeOptions(options).build();
 }
