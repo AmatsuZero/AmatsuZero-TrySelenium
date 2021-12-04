@@ -7,7 +7,7 @@ const SleepTime = 1000;
 
 const canRetry = (e: any, cnt: number) => {
   const info = e as { name: string };
-  return info.name === "NoSuchElementError" && cnt < MaxRetryCount;
+  return (info.name === "NoSuchElementError" || info.name === "TimeoutError") && cnt < MaxRetryCount;
 }
 
 export default class DetailPage {

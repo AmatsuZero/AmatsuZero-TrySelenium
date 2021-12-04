@@ -12,8 +12,10 @@ import fs from "fs";
 import os from 'os';
 import { Console } from 'console';
 import process from 'process';
+import { createInterface } from 'readline';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
+const logPath = path.join(__dirname, '..', 'log.txt');
 
 const PageCode = {
   NEW: 'forum-561'
@@ -71,16 +73,7 @@ const findAvailableHost = async () => {
   return expectedHost;
 }
 
-const ws = fs.createWriteStream(path.join(__dirname, '..', 'log.txt'), {
-  flags:'w', // 文件的打开模式
-  mode:0o666, // 文件的权限设置
-  encoding:'utf8', // 写入文件的字符的编码
-  highWaterMark:3, // 最高水位线
-  start:0, // 写入文件的起始索引位置        
-  autoClose:true, // 是否自动关闭文档
-})
-
-const Logger = new Console(ws, ws);
+let Logger: Console;
 
 process.stdin.resume();// so the program will not close instantly
 
@@ -119,6 +112,64 @@ const getThreadId = (href: string) => {
   return parseInt(id, 10);
 };
 
+const parseInitArgs = async () => {
+  let startpage = 1
+  let pages: string[] = [];
+  let isResume = false;
+  // 检查起始页码
+  for (const arg of process.argv) {
+    if (arg.startsWith("--page")) {
+      startpage = parseInt(arg.split("=")[1], 10);
+    } else if (arg.startsWith("--resume")) {
+      isResume = true;
+      const value = await processLogByLine(logPath);
+      startpage = value.startPage;
+      pages = value.retryPages;
+    } else if (arg.startsWith("--single")) {
+      pages = arg.split("")[1].split(",");
+    }
+  }
+  const ws = fs.createWriteStream(logPath, {
+    flags:'w', // 文件的打开模式
+    mode:0o666, // 文件的权限设置
+    encoding:'utf8', // 写入文件的字符的编码
+    highWaterMark:3, // 最高水位线
+    start:0, // 写入文件的起始索引位置        
+    autoClose:true, // 是否自动关闭文档
+  });
+  Logger = new Console(ws, ws);
+  return { startpage, pages, isResume };
+};
+
+const processLogByLine = async (path: string) => {
+  const fileStream = fs.createReadStream(path);
+  const rl = createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+  // Note: we use the crlfDelay option to recognize all instances of CR LF
+  // ('\r\n') in input.txt as a single line break.
+  let startPage = -1;
+  const retryPages: string[] = [];
+  for await (const line of rl) {
+    // Each line in input.txt will be successively available here as `line`.
+    if (line.startsWith("🔗 即将打开新作品")) {
+      const array = line.split("：")[0].match( /[0-9]/g);
+      if (array !== null) {
+        const page = parseInt(array.join(""), 10);
+        if (page > startPage) {
+          startPage = page;
+        }
+      }
+    } else if (line.startsWith("❌ 提取页面信息失败:") 
+    || line.startsWith("❌ 解析保存失败:")) {
+      const href = line.split(": ")[1];
+      retryPages.push(href);
+    }
+  }
+  return { startPage, retryPages };
+};
+
 export {
   makeBrowser,
   findAvailableHost,
@@ -126,4 +177,5 @@ export {
   SISPaths,
   PageCode,
   Logger,
+  parseInitArgs
 }

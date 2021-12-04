@@ -4,7 +4,7 @@ import { Connection, createConnection } from "typeorm";
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import NewListPage from './newlist';
-import { findAvailableHost, Logger } from './util';
+import { findAvailableHost, Logger, parseInitArgs } from './util';
 
 const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
   const repo = connection.getRepository(InfoModel);
@@ -36,7 +36,14 @@ const prepareConnection = async () => {
   return { connection, hasHistoryData };
 };
 
-const parseNewListPage = async (host: string, connection: Connection, hasHistoryData: boolean) => {
+const parseNewListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
+  const host = await findAvailableHost();
+  if (host.length === 0) {
+    Logger.error('❌ 没有可以访问的域名', -1);
+    return;
+  } else {
+    Logger.log(`☁️ 使用域名为：${host}`);    
+  }
   let latestId = -1;
   let earliestId = -1;
   if (!hasHistoryData) {
@@ -63,20 +70,33 @@ const parseNewListPage = async (host: string, connection: Connection, hasHistory
   }
   Logger.log('✨ 开始解析新作品列表');
   const newListPage = new NewListPage(host, latestId, earliestId);
+  newListPage.currentPage = startPage;
   await newListPage.getAllThreadLinks(async (hrefs) => parseNewlistData(connection, hrefs));
   Logger.log('✨ 解析新作品列表结束');
 };
 
+const specifiedPages = async (connection: Connection, pages: string[]) => {
+  Logger.log("🔧 开始解析单独页面");
+  await parseNewlistData(connection, pages);
+};
+
+const resume = async (connection: Connection, start: number, pages: string[]) => {
+  Logger.log("🔧 从上次日志恢复");
+  await specifiedPages(connection, pages);
+  await parseNewListPage(connection, start, true);
+};
+
 (async () => {
+  const { startpage, pages, isResume } = await parseInitArgs();
   Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
   const { connection, hasHistoryData } = await prepareConnection();
   try {
-    const host = await findAvailableHost();
-    if (host.length === 0) {
-      Logger.error('❌ 没有可以访问的域名', -1);
+    if (isResume) {
+      await resume(connection, startpage, pages);
+    } else if (pages.length > 0) {
+      await specifiedPages(connection, pages);
     } else {
-      Logger.log(`☁️ 使用域名为：${host}`);
-      await parseNewListPage(host, connection, hasHistoryData);
+      await parseNewListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');
