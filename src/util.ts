@@ -13,6 +13,7 @@ import os from 'os';
 import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
+import dotenv from "dotenv";
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const logPath = path.join(__dirname, '..', 'log.txt');
@@ -38,6 +39,9 @@ const hosts = [
 const makeBrowser = async () => {
   const options = new Options();
   options.addArguments("--headless"); // 创建无头浏览器
+  // 尝试解决超时问题：https://stackoverflow.com/questions/48450594/selenium-timed-out-receiving-message-from-renderer
+  options.addArguments("enable-automation");
+  options.addArguments("start-maximized");
   const builder = new Builder().forBrowser(Browser.CHROME);
   if(os.platform() === 'linux') {// linux 需要指定 driver 位置
     const location = path.join(__dirname, "..", "env/linux", "chromedriver");
@@ -112,6 +116,9 @@ const getThreadId = (href: string) => {
   return parseInt(id, 10);
 };
 
+// 加载环境变量
+dotenv.config();
+
 const parseInitArgs = async () => {
   let startpage = 1
   let pages: string[] = [];
@@ -165,6 +172,12 @@ const processLogByLine = async (path: string) => {
     || line.startsWith("❌ 解析保存失败:")) {
       const href = line.split(": ")[1];
       retryPages.push(href);
+    } else if (line.startsWith("🔧 从上次日志恢复：")) {
+      const num = line.split("：")[1];
+      const page = parseInt(num, 10);
+      if (page > startPage) {
+        startPage = page;
+      }
     }
   }
   return { startPage, retryPages };

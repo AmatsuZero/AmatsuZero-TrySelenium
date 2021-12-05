@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from "path";
+import { URL } from 'url';
 import { Connection, createConnection } from "typeorm";
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
@@ -81,7 +82,15 @@ const specifiedPages = async (connection: Connection, pages: string[]) => {
 };
 
 const resume = async (connection: Connection, start: number, pages: string[]) => {
-  Logger.log("🔧 从上次日志恢复");
+  // 防止恢复页面中失败，进而丢失上次是恢复到第几页了，先打一个信息出来
+  if (pages.length > 0 && start > 1) {
+    Logger.log(`🔧 从上次日志恢复：${start}`);
+  } else {
+    Logger.log("🔧 从上次日志恢复");
+  }
+  if (pages.length > 0) {
+    Logger.log(`🔧 要重新尝试下载的作品有：${pages.join("\n")}`);
+  }
   await specifiedPages(connection, pages);
   await parseNewListPage(connection, start, true);
 };

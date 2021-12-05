@@ -78,6 +78,10 @@ class InfoModel {
     }
   }
 
+  public notionProperties() {
+    
+  }
+
   public toString() {
     return `---- thread id: ${this.threadId} ---- 
     【影片名稱】：${this.title}  
