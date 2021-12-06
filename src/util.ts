@@ -183,6 +183,19 @@ const processLogByLine = async (path: string) => {
   return { startPage, retryPages };
 };
 
+let TotalFailuresCount = 0;
+const MaxFailuresCount = 10;
+const ShouldCountinue = () => {
+  const ans = TotalFailuresCount >= MaxFailuresCount;
+  if (ans) {
+    Logger.log(`❌ 达到最大错误出现上限${MaxFailuresCount}，终止程序`);
+    process.exit(-100);
+  } else {
+    TotalFailuresCount += 1;
+  }
+  return !ans;
+}
+
 export {
   makeBrowser,
   findAvailableHost,
@@ -190,5 +203,6 @@ export {
   SISPaths,
   PageCode,
   Logger,
-  parseInitArgs
+  parseInitArgs,
+  ShouldCountinue,
 }

@@ -1,13 +1,15 @@
 import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
-import { makeBrowser, Logger, getThreadId } from "./util";
+import { makeBrowser, Logger, getThreadId, ShouldCountinue } from "./util";
 
 const MaxRetryCount = 3;
 const SleepTime = 1000;
 
 const canRetry = (e: any, cnt: number) => {
   const info = e as { name: string };
-  return (info.name === "NoSuchElementError" || info.name === "TimeoutError") && cnt < MaxRetryCount;
+  return ShouldCountinue() 
+  && (info.name === "NoSuchElementError" || info.name === "TimeoutError") 
+  && cnt < MaxRetryCount;
 }
 
 export default class DetailPage {

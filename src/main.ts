@@ -1,11 +1,10 @@
 import fs from 'fs';
 import path from "path";
-import { URL } from 'url';
 import { Connection, createConnection } from "typeorm";
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import NewListPage from './newlist';
-import { findAvailableHost, Logger, parseInitArgs } from './util';
+import { findAvailableHost, Logger, parseInitArgs, ShouldCountinue } from './util';
 
 const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
   const repo = connection.getRepository(InfoModel);
@@ -20,6 +19,7 @@ const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
       await repo.save(info);
       Logger.log(`🍺 解析完成: ${info.title}`);
     } catch (e) {
+      ShouldCountinue();
       Logger.error(`❌ 解析保存失败: ${href}`);
       Logger.error(e);
     }
@@ -83,7 +83,7 @@ const specifiedPages = async (connection: Connection, pages: string[]) => {
 
 const resume = async (connection: Connection, start: number, pages: string[]) => {
   // 防止恢复页面中失败，进而丢失上次是恢复到第几页了，先打一个信息出来
-  if (pages.length > 0 && start > 1) {
+  if (start > 1) {
     Logger.log(`🔧 从上次日志恢复：${start}`);
   } else {
     Logger.log("🔧 从上次日志恢复");

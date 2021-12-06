@@ -1,6 +1,6 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { URL } from "url";
-import { getThreadId, Logger, makeBrowser, PageCode, SISPaths } from "./util";
+import { getThreadId, Logger, makeBrowser, PageCode, ShouldCountinue, SISPaths } from "./util";
 
 
 const extractLinks = async (elms: WebElement[]) => {
@@ -37,6 +37,7 @@ export default class NewListPage {
         await block(links.filter(link => this.threadsFilter(link)));
         await this.nextPage();
       } catch (e) {
+        ShouldCountinue();
         Logger.log("❌ 提取新作品页面出错了");
         Logger.error(e);
       }
@@ -61,6 +62,7 @@ export default class NewListPage {
       parent = await parent.findElement(By.xpath(`//*[@id='${id}']`));
       elms = await parent.findElements(By.xpath("//tbody"));
     } catch (e) {
+      ShouldCountinue();
       Logger.log(`❌ 解析详情失败：${url}`);
       Logger.error(e);
     }
@@ -88,6 +90,7 @@ export default class NewListPage {
       this.currentPage += 1;
       Logger.log("🏃 进入到下一页");
     } catch (e) {
+      ShouldCountinue();
       Logger.log(`❌ 进入到下一页失败，当前页面：${this.currentPage}`);
       Logger.error(e);
     }
@@ -106,6 +109,7 @@ export default class NewListPage {
       this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
       Logger.log(`📖 新作品一共${this.maxPage}页`);
     } catch (e) {
+      ShouldCountinue();
       Logger.log('❌ 查找最大页面失败');
       Logger.error(e);
     }
