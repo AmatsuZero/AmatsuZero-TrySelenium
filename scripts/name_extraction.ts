@@ -1,18 +1,43 @@
 import { spawn } from 'child_process';
 import path from 'path';
+import { createConnection } from "typeorm";
+import { InfoModel } from "../dist/entity/info"
 
 const scriptpath = path.join(__dirname, 'name_extraction.py');
 
-const pythonProcess = spawn('python3', [scriptpath, "(ミセスの素顔)(MRSS-093)息子の手術費用を稼ぐために、愛する妻が1年間資産家の肉便器になる契約を結びました。波多野結衣 藤森里穂"]);
-
-const extracName = () => new Promise((resolve, reject) => {
-  pythonProcess.stdout.on("data", data =>{
-      resolve(data.toString()); // <------------ by default converts to utf-8
+const extracName = (title: string) => new Promise<string[]>((resolve, reject) => {
+  const pythonProcess = spawn('python3', [scriptpath, title]);
+  pythonProcess.stdout.on("data", data => {
+    const input: string = data.toString();
+    const names = input.split(',')
+      .map(n => n.replace('[', ""))
+      .map(n => n.replace(']', ""))
+      .map(n => n.trim())
+      .map(n => n.replace(/'/g, ""));
+    resolve(names); // <------------ by default converts to utf-8
+    if (!pythonProcess.kill()) {
+      console.log(`${pythonProcess} kill failed`);
+    }
   });
-  process.stderr.on("data", reject);
+  process.stderr.on("data", data => {
+    reject(data);
+    if (!pythonProcess.kill()) {
+      console.log(`${pythonProcess} kill failed`);
+    }
+  });
 });
 
 (async () => {
-  const output = await extracName();
-  console.log(output);
+  const connection = await createConnection();
+  const repo = connection.getRepository(InfoModel);
+  const info = await repo.find();
+
+  for (const e of info) {
+    const actors = await extracName(e.title);
+    e.actors = actors;
+    await repo.save(e);
+    console.log(`${e.title}: ${actors}`);
+  }
+  connection.close();
+  process.exit(0);
 })();

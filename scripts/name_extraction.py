@@ -19,4 +19,4 @@ def extract(title):
   print(names)
   sys.stdout.flush()
 
-extract(sys.arg[1])
+extract(sys.argv[1])
