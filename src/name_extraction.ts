@@ -1,9 +1,9 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { createConnection } from "typeorm";
-import { InfoModel } from "../dist/entity/info"
+import { InfoModel } from "./entity/info";
 
-const scriptpath = path.join(__dirname, 'name_extraction.py');
+const scriptpath = path.join(__dirname, '../scripts', 'name_extraction.py');
 
 const extracName = (title: string) => new Promise<string[]>((resolve, reject) => {
   const pythonProcess = spawn('python3', [scriptpath, title]);
