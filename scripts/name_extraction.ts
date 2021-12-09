@@ -33,6 +33,9 @@ const extracName = (title: string) => new Promise<string[]>((resolve, reject) =>
   const info = await repo.find();
 
   for (const e of info) {
+    if(e.actors.length > 0) {
+      continue;
+    }
     const actors = await extracName(e.title);
     e.actors = actors;
     await repo.save(e);
