@@ -23,6 +23,7 @@ export default class NewListPage {
   public driver?: WebDriver;
   public latestId: number;
   public earliestid: number;
+  public title = "新作品";
 
   public constructor(host: string, latestId: number, earliestid: number) {
     this.host = host;
@@ -52,7 +53,7 @@ export default class NewListPage {
     const url = this.currentPageURL();
     let elms: WebElement[] = [];
     try {
-      Logger.log(`🔗 即将打开新作品第${this.currentPage}页：${url}`);
+      Logger.log(`🔗 即将打开${this.title}第${this.currentPage}页：${url}`);
       await this.driver.get(url);
       if (this.maxPage === -1) {
         await this.findMaxPage();
@@ -72,7 +73,7 @@ export default class NewListPage {
     return extractLinks(elms);
   }
 
-  private currentPageURL() {
+  public currentPageURL() {
     const path = `${SISPaths.NEW}-${this.currentPage}.html`;
     return new URL(path, this.host).href;
   }

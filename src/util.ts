@@ -19,12 +19,14 @@ const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const logPath = path.join(__dirname, '..', 'log.txt');
 
 const PageCode = {
-  NEW: 'forum-561'
+  NEW: 'forum-561',
+  ACG: 'forum-231',
 }
 
 const SISPaths = {
   INDEX: "/bbs",
-  NEW: `/bbs/${PageCode.NEW}`
+  NEW: `/bbs/${PageCode.NEW}`,
+  ACG: `bbs/${PageCode.ACG}`
 }
 
 const hosts = [
