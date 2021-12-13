@@ -6,7 +6,6 @@ export default class ACGList extends NewListPage {
 
   public getAllThreadsOnCurrentPage(needClose?: boolean): Promise<string[]> {
     const links = super.getAllThreadsOnCurrentPage(needClose);
-
     return links;
   }
 

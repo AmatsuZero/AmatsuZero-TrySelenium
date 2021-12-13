@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from "path";
 import { Connection, createConnection } from "typeorm";
 import { Logger, parseInitArgs } from './util';
-import { parseNewlistData, parseNewListPage } from './route';
+import { parseACGListPage, parseNewlistData, parseNewListPage } from './route';
 
 const prepareConnection = async () => {
   Logger.log("💻 准备创建数据库链接");
@@ -45,6 +45,7 @@ const resume = async (connection: Connection, start: number, pages: string[]) =>
       await specifiedPages(connection, pages);
     } else {
       await parseNewListPage(connection, startpage, hasHistoryData);
+      // await parseACGListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');

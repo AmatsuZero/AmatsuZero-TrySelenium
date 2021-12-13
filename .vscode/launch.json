@@ -5,6 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Jest",
+      "type": "pwa-node",
+      "env": {
+        "NODE_ENV": "TEST"
+      },
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+      "program": "${file}",
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
       "name": "Python",
       "type": "python",
       "request": "launch",
@@ -23,8 +37,11 @@
         "${workspaceFolder}/**/*.js"
       ],
       "args": [
-        "--resume"
-      ]
+        // "--resume"
+      ],
+      "env":{
+        "NODE_ENV": "DEBUG"
+      }
     },
     {
       "name": "Scripts",

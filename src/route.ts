@@ -3,6 +3,7 @@ import NewListPage from './newlist';
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import { findAvailableHost, Logger, ShouldCountinue } from './util';
+import ACGList from './acglist';
 
 const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
   const repo = connection.getRepository(InfoModel);
@@ -24,10 +25,14 @@ const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
   }
 };
 
-const beforeParse = async (connection: Connection, category: string, startPage: number, hasHistoryData: boolean) => {
+const parseACGListData = async (connection: Connection, hrefs: string[]) => {
+  
+};
+
+const beforeParse = async (connection: Connection, category: string, hasHistoryData: boolean) => {
   const host = await findAvailableHost();
   if (host.length === 0) {
-    return;
+    throw new Error("❌ 没有可以访问的域名");
   } else {
     Logger.log(`☁️ 使用域名为：${host}`);    
   }
@@ -40,6 +45,7 @@ const beforeParse = async (connection: Connection, category: string, startPage: 
     // 查找最后和最新一条数据的 thread id
     const repo = connection.getRepository(InfoModel);
     const latest = await repo.findOne({
+      where: [{ category }],
       order: { threadId: 'DESC' }
     });
     if (latest !== undefined) {
@@ -47,6 +53,7 @@ const beforeParse = async (connection: Connection, category: string, startPage: 
       latestId = latest.threadId;
     }
     const earliest = await repo.findOne({
+      where: [{ category }],
       order: { threadId: 'ASC' }
     });
     if (earliest !== undefined) {
@@ -63,7 +70,7 @@ const beforeParse = async (connection: Connection, category: string, startPage: 
 };
 
 const parseNewListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
-  
+  const { host, latestId, earliestId } = await beforeParse(connection, "new", hasHistoryData);
   Logger.log('✨ 开始解析新作品列表');
   const newListPage = new NewListPage(host, latestId, earliestId);
   newListPage.currentPage = startPage;
@@ -71,7 +78,17 @@ const parseNewListPage = async (connection: Connection, startPage: number, hasHi
   Logger.log('✨ 解析新作品列表结束');
 };
 
+const parseACGListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
+  const { host, latestId, earliestId } = await beforeParse(connection, "acg", hasHistoryData);
+  Logger.log('✨ 开始解析 ACG 列表');
+  const acgList = new ACGList(host, latestId, earliestId);
+  acgList.currentPage = startPage;
+  await acgList.getAllThreadLinks(async (hrefs) => parseACGListData(connection, hrefs));
+  Logger.log('✨ 解析 ACG 列表结束');
+};
+
 export {
   parseNewlistData,
   parseNewListPage,
+  parseACGListPage,
 }

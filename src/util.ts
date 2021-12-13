@@ -138,16 +138,24 @@ const parseInitArgs = async () => {
       pages = arg.split("")[1].split(",");
     }
   }
-  const ws = fs.createWriteStream(logPath, {
-    flags:'w', // 文件的打开模式
-    mode:0o666, // 文件的权限设置
-    encoding:'utf8', // 写入文件的字符的编码
-    highWaterMark:3, // 最高水位线
-    start:0, // 写入文件的起始索引位置        
-    autoClose:true, // 是否自动关闭文档
-  });
-  Logger = new Console(ws, ws);
+  createLogger();
   return { startpage, pages, isResume };
+};
+
+const createLogger = () => {
+  if (process.env.NODE_ENV === "TEST" || process.env.NODE_ENV === "DEBUG") {
+    Logger = console;
+  } else {
+    const ws = fs.createWriteStream(logPath, {
+      flags:'w', // 文件的打开模式
+      mode:0o666, // 文件的权限设置
+      encoding:'utf8', // 写入文件的字符的编码
+      highWaterMark:3, // 最高水位线
+      start:0, // 写入文件的起始索引位置        
+      autoClose:true, // 是否自动关闭文档
+    });
+    Logger = new Console(ws, ws);
+  }
 };
 
 const processLogByLine = async (path: string) => {
