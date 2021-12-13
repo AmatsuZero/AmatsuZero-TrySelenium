@@ -2,28 +2,40 @@ import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { URL } from "url";
 import { getThreadId, Logger, makeBrowser, PageCode, ShouldCountinue, SISPaths } from "./util";
 
+class ThreadInfo {
+  public href: string;
+  public tag: string;
+
+  public constructor(href:string, tag: string) {
+    this.href = href;
+    this.tag = tag;
+  }
+}
 
 const extractLinks = async (elms: WebElement[]) => {
-  const hrefs: string[] = [];
+  const hrefs: ThreadInfo[] = [];
   for (const elm of elms) {
     const id = await elm.getAttribute("id");
     if (id.startsWith("normalthread_")) {
       const link = elm.findElement(By.xpath(`//*[@id="thread_${id.split("_")[1]}"]/a`));
       const href = await link.getAttribute("href");
-      hrefs.push(href);
+      const threadId = getThreadId(href);
+      const tagElm = await elm.findElement(By.xpath(`*[@id="normalthread_${threadId}"]/tr/th/em/a`));
+      const tag = await tagElm.getText();
+      hrefs.push(new ThreadInfo(href, tag));
     }
   }
+ 
   return hrefs;
 }
 
-export default class NewListPage {
+class NewListPage {
   public currentPage = 1;
   public host: string;
   public maxPage = -1;
   public driver?: WebDriver;
   public latestId: number;
   public earliestid: number;
-  public title = "新作品";
 
   public constructor(host: string, latestId: number, earliestid: number) {
     this.host = host;
@@ -31,11 +43,11 @@ export default class NewListPage {
     this.earliestid = earliestid;
   }
 
-  public async getAllThreadLinks(block: (hrefs: string[]) => Promise<void>) {
+  public async getAllThreadLinks(block: (hrefs: {href: string, tag: string }[]) => Promise<void>) {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
-        await block(links.filter(link => this.threadsFilter(link)));
+        await block(links.filter(link => this.threadsFilter(link.href)));
         await this.nextPage();
       } catch (e) {
         ShouldCountinue();
@@ -53,15 +65,12 @@ export default class NewListPage {
     const url = this.currentPageURL();
     let elms: WebElement[] = [];
     try {
-      Logger.log(`🔗 即将打开${this.title}第${this.currentPage}页：${url}`);
+      Logger.log(`🔗 即将打开${this.title()}第${this.currentPage}页：${url}`);
       await this.driver.get(url);
       if (this.maxPage === -1) {
         await this.findMaxPage();
       }
-      let parent = await this.driver.findElement(By.className("mainbox threadlist"));
-      const id = PageCode.NEW.replace("-", "_");
-      parent = await parent.findElement(By.xpath(`//*[@id='${id}']`));
-      elms = await parent.findElements(By.xpath("//tbody"));
+      elms = await this.findOutElements();
     } catch (e) {
       ShouldCountinue();
       Logger.log(`❌ 解析详情失败：${url}`);
@@ -73,12 +82,22 @@ export default class NewListPage {
     return extractLinks(elms);
   }
 
-  public currentPageURL() {
+  protected async findOutElements() {
+    if (this.driver === undefined) {
+      return [];
+    }
+    let parent = await this.driver.findElement(By.className("mainbox threadlist"));
+    const id = this.pathReplacement().replace("-", "_");
+    parent = await parent.findElement(By.xpath(`//*[@id='${id}']`));
+    return parent.findElements(By.xpath("//tbody"));
+  }
+
+  protected currentPageURL() {
     const path = `${SISPaths.NEW}-${this.currentPage}.html`;
     return new URL(path, this.host).href;
   }
 
-  private async nextPage() {
+  protected async nextPage() {
     if (this.driver === undefined || this.currentPage >= this.maxPage) {
       this.destroy();
       return
@@ -97,7 +116,7 @@ export default class NewListPage {
     }
   }
 
-  private async findMaxPage() {
+  protected async findMaxPage() {
     if (this.driver === undefined) {
       return
     }
@@ -107,8 +126,8 @@ export default class NewListPage {
       let link = await last.getAttribute("href");
       link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
       link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
-      this.maxPage = parseInt(link.split(`${PageCode.NEW}-`)[1], 10);
-      Logger.log(`📖 新作品一共${this.maxPage}页`);
+      this.maxPage = parseInt(link.split(`${this.pathReplacement()}-`)[1], 10);
+      Logger.log(`📖 ${this.title()}一共${this.maxPage}页`);
     } catch (e) {
       ShouldCountinue();
       Logger.log('❌ 查找最大页面失败');
@@ -116,7 +135,7 @@ export default class NewListPage {
     }
   }
 
-  private threadsFilter(link: string) {
+  protected threadsFilter(link: string) {
     const id = getThreadId(link);
     const needParse = id > this.latestId || id < this.earliestid;
     if (!needParse) {
@@ -125,11 +144,24 @@ export default class NewListPage {
     return needParse;
   }
 
-  private async destroy() {
+  protected async destroy() {
     if (this.driver === undefined) {
       return
     }
     await this.driver.close();
     this.driver = undefined;
   }
+
+  protected pathReplacement() {
+    return PageCode.NEW;
+  }
+
+  protected title() {
+    return "新作品";
+  }
+}
+
+export {
+  NewListPage,
+  ThreadInfo
 }

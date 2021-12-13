@@ -3,6 +3,7 @@ import path from "path";
 import { Connection, createConnection } from "typeorm";
 import { Logger, parseInitArgs } from './util';
 import { parseACGListPage, parseNewlistData, parseNewListPage } from './route';
+import { ThreadInfo } from './newlist';
 
 const prepareConnection = async () => {
   Logger.log("💻 准备创建数据库链接");
@@ -15,12 +16,12 @@ const prepareConnection = async () => {
   return { connection, hasHistoryData };
 };
 
-const specifiedPages = async (connection: Connection, pages: string[]) => {
+const specifiedPages = async (connection: Connection, pages: ThreadInfo[]) => {
   Logger.log("🔧 开始解析单独页面");
   await parseNewlistData(connection, pages);
 };
 
-const resume = async (connection: Connection, start: number, pages: string[]) => {
+const resume = async (connection: Connection, start: number, pages: ThreadInfo[]) => {
   // 防止恢复页面中失败，进而丢失上次是恢复到第几页了，先打一个信息出来
   if (start > 1) {
     Logger.log(`🔧 从上次日志恢复：${start}`);
@@ -45,7 +46,7 @@ const resume = async (connection: Connection, start: number, pages: string[]) =>
       await specifiedPages(connection, pages);
     } else {
       await parseNewListPage(connection, startpage, hasHistoryData);
-      // await parseACGListPage(connection, startpage, hasHistoryData);
+      await parseACGListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');

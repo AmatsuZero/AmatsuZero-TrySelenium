@@ -14,11 +14,13 @@ const canRetry = (e: any, cnt: number) => {
 
 export default class DetailPage {
   public href: string;
+  public tag: string;
   private retryCount = 0;
   private torrentRetryCnt = 0;
 
-  public constructor(href: string) {
+  public constructor(href: string, tag: string) {
     this.href = href;
+    this.tag = tag;
   }
 
   public async extractInfo() {
@@ -27,7 +29,8 @@ export default class DetailPage {
       await driver.get(this.href);
       const msgFont = await driver.findElement(By.className("t_msgfont"));
       const detail = new InfoModel(msgFont, this.threadId());
-      detail.category = "new";
+      detail.tag = this.tag;
+      detail.category = this.category();
       await detail.build();
       await this.findTorrentLink(detail, driver); // 提取种子链接
       return detail;
@@ -39,7 +42,7 @@ export default class DetailPage {
         driver.sleep(SleepTime); // sleep 1s 后重试
         this.extractInfo();
       } else {
-        Logger.log(`❌ 提取页面信息失败: ${this.href}`);
+        Logger.log(`❌ 提取页面信息失败: ${this.tag}-${this.href}`);
         Logger.error(e);
       }
     } finally {
@@ -47,7 +50,7 @@ export default class DetailPage {
     }
   }
 
-  private async findTorrentLink(model: InfoModel, driver: WebDriver, pageLink = "") {
+  protected async findTorrentLink(model: InfoModel, driver: WebDriver, pageLink = "") {
     let links: string[] = [];
 
     if (pageLink.length > 0) {
@@ -82,7 +85,11 @@ export default class DetailPage {
     }
   }
 
-  private threadId() {
+  protected threadId() {
     return getThreadId(this.href);
+  }
+
+  protected category() {
+    return "new";
   }
 }

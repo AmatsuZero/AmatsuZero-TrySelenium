@@ -14,6 +14,7 @@ import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
 import dotenv from "dotenv";
+import { ThreadInfo } from './newlist';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const logPath = path.join(__dirname, '..', 'log.txt');
@@ -123,7 +124,7 @@ dotenv.config();
 
 const parseInitArgs = async () => {
   let startpage = 1
-  let pages: string[] = [];
+  let pages: ThreadInfo[] = [];
   let isResume = false;
   // 检查起始页码
   for (const arg of process.argv) {
@@ -135,7 +136,7 @@ const parseInitArgs = async () => {
       startpage = value.startPage;
       pages = value.retryPages;
     } else if (arg.startsWith("--single")) {
-      pages = arg.split("")[1].split(",");
+      pages = arg.split("")[1].split(",").map(page => new ThreadInfo(page, ""));
     }
   }
   createLogger();
@@ -167,7 +168,7 @@ const processLogByLine = async (path: string) => {
   // Note: we use the crlfDelay option to recognize all instances of CR LF
   // ('\r\n') in input.txt as a single line break.
   let startPage = -1;
-  const retryPages: string[] = [];
+  const retryPages: ThreadInfo[] = [];
   for await (const line of rl) {
     // Each line in input.txt will be successively available here as `line`.
     if (line.startsWith("🔗 即将打开新作品")) {
@@ -181,7 +182,8 @@ const processLogByLine = async (path: string) => {
     } else if (line.startsWith("❌ 提取页面信息失败:") 
     || line.startsWith("❌ 解析保存失败:")) {
       const href = line.split(": ")[1];
-      retryPages.push(href);
+      const parts = href.split("-");
+      retryPages.push(new ThreadInfo(parts[0], parts.length > 1 ? parts[1] : ""));
     } else if (line.startsWith("🔧 从上次日志恢复：")) {
       const num = line.split("：")[1];
       const page = parseInt(num, 10);

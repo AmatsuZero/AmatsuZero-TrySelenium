@@ -1,16 +1,20 @@
-import NewListPage from "./newlist";
-import { SISPaths } from "./util";
+import { By } from 'selenium-webdriver';
+import { NewListPage } from "./newlist";
+import { PageCode, SISPaths } from "./util";
+
+
 
 export default class ACGList extends NewListPage {
-  public title = "ACG";
-
-  public getAllThreadsOnCurrentPage(needClose?: boolean): Promise<string[]> {
-    const links = super.getAllThreadsOnCurrentPage(needClose);
-    return links;
+  protected currentPageURL(): string {
+    const path = `${SISPaths.ACG}-${this.currentPage}.html`;
+    return new URL(path, this.host).href;
   }
 
-  public currentPageURL(): string {
-    const path = `${SISPaths.NEW}-${this.currentPage}.html`;
-    return new URL(path, this.host).href;
+  protected pathReplacement(): string {
+    return PageCode.ACG;
+  }
+
+  protected title() {
+    return "ACG";
   }
 }

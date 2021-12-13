@@ -1,31 +1,31 @@
 import { Connection } from 'typeorm';
-import NewListPage from './newlist';
+import { NewListPage, ThreadInfo } from './newlist';
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
 
-const parseNewlistData = async (connection: Connection, hrefs: string[]) => {
+const parseNewlistData = async (connection: Connection, hrefs: ThreadInfo[]) => {
   const repo = connection.getRepository(InfoModel);
   for (const href of hrefs) {
-    Logger.log(`🔍 即将解析详情页面：${href}`);
-    const detail = new DetailPage(href);
+    Logger.log(`🔍 即将解析详情页面：${href.href}`);
+    const detail = new DetailPage(href.href, href.tag);
     try {
       const info = await detail.extractInfo();
       if (info === undefined) {
         continue;
       }
       await repo.save(info);
-      Logger.log(`🍺 解析完成: ${info.title}`);
+      Logger.log(`🍺 解析完成: ${href.tag}-${info.title}`);
     } catch (e) {
       ShouldCountinue();
-      Logger.error(`❌ 解析保存失败: ${href}`);
+      Logger.error(`❌ 解析保存失败: ${href.tag}-${href.href}`);
       Logger.error(e);
     }
   }
 };
 
-const parseACGListData = async (connection: Connection, hrefs: string[]) => {
+const parseACGListData = async (connection: Connection, hrefs: ThreadInfo[]) => {
   
 };
 

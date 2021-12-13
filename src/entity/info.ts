@@ -6,35 +6,38 @@ class InfoModel {
   @PrimaryColumn()
   public threadId: number;
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public title = "";
 
-  @Column("simple-array")
+  @Column("simple-array", { nullable: true, default: '' })
   public actors: string[] = [];
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public format = "";
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public postId = "";
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public size = "";
 
-  @Column()
+  @Column("boolean", { nullable: true, default: true })
   public isBlurred: boolean;
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public sig = "";
 
-  @Column("simple-array")
+  @Column("simple-array", { nullable: true, default: '' })
   public thumbnails: string[] = [];
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public torrentLink = "";
 
-  @Column("text")
+  @Column("text", { nullable: true, default: "" })
   public category = "unknown";
+
+  @Column("text", { nullable: true, default: "" })
+  public tag = "";
 
   private sourceElment: WebElement;
 
