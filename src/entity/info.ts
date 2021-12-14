@@ -1,9 +1,9 @@
 import { By, WebElement } from "selenium-webdriver";
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 class InfoModel {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   public threadId: number;
 
   @Column("text", { nullable: true, default: "" })

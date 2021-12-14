@@ -17,11 +17,14 @@ const extractLinks = async (elms: WebElement[]) => {
   for (const elm of elms) {
     const id = await elm.getAttribute("id");
     if (id.startsWith("normalthread_")) {
-      const link = elm.findElement(By.xpath(`//*[@id="thread_${id.split("_")[1]}"]/a`));
+      const threadId = id.split("_")[1];
+      const link = elm.findElement(By.xpath(`//*[@id="thread_${threadId}"]/a`));
       const href = await link.getAttribute("href");
-      const threadId = getThreadId(href);
-      const tagElm = await elm.findElement(By.xpath(`*[@id="normalthread_${threadId}"]/tr/th/em/a`));
-      const tag = await tagElm.getText();
+      let tag = '';
+      try {
+        const tagElm = await elm.findElement(By.xpath(`//*[@id="normalthread_${threadId}"]/tr/th/em/a`));
+        tag = await tagElm.getText();
+      } catch {}
       hrefs.push(new ThreadInfo(href, tag));
     }
   }

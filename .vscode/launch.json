@@ -36,12 +36,9 @@
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ],
-      "args": [
-        // "--resume"
-      ],
       "env":{
         "NODE_ENV": "DEBUG"
-      }
+      },
     },
     {
       "name": "Scripts",
