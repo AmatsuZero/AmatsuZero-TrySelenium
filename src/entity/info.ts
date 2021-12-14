@@ -131,10 +131,14 @@ class InfoModel {
       this.buildCartoonInfo(lines);
       break;
     default:
+      this.buildMiscInfo();
       break;
     }
     // 提取预览图链接
-    const pics = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]//img`));
+    let pics = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]//img`));
+    if (pics.length === 0) {
+      pics = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]/img`));
+    }
     for (const pic of pics) {
       const link = await pic.getAttribute("src");
       if (link.length > 0) {
@@ -213,8 +217,8 @@ class InfoModel {
     });
   }
 
-  protected async localizationGroup() {
-    
+  protected async buildMiscInfo() {
+    console.log("");
   }
 
   protected blurVerification(str: string) {

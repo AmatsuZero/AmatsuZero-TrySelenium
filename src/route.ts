@@ -8,7 +8,7 @@ import ACGDetailPage from './acgdetail';
 
 const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
-    Logger.log(`🔍 即将解析详情页面：${href.href}`);
+    Logger.log(`🔍 即将解析新作品详情页面：${href.href}`);
     const detail = new DetailPage(href.href, href.tag);
     try {
       const info = await detail.extractInfo();
@@ -27,7 +27,7 @@ const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]
 
 const parseACGListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
-    Logger.log(`🔍 即将解析详情页面：${href.href}`);
+    Logger.log(`🔍 即将解析ACG详情页面：${href.href}`);
     const detail = new ACGDetailPage(href.href, href.tag);
     try {
       const info = await detail.extractInfo();
