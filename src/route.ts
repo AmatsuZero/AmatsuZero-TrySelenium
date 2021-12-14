@@ -4,6 +4,7 @@ import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
+import ACGDetailPage from './acgdetail';
 
 const parseNewlistData = async (connection: Connection, hrefs: ThreadInfo[]) => {
   const repo = connection.getRepository(InfoModel);
@@ -26,7 +27,23 @@ const parseNewlistData = async (connection: Connection, hrefs: ThreadInfo[]) => 
 };
 
 const parseACGListData = async (connection: Connection, hrefs: ThreadInfo[]) => {
-  
+  const repo = connection.getRepository(InfoModel);
+  for (const href of hrefs) {
+    Logger.log(`🔍 即将解析详情页面：${href.href}`);
+    const detail = new ACGDetailPage(href.href, href.tag);
+    try {
+      const info = await detail.extractInfo();
+      if (info === undefined) {
+        continue;
+      }
+      await repo.save(info);
+      Logger.log(`🍺 解析完成: ${href.tag}-${info.title}`);
+    } catch (e) {
+      ShouldCountinue();
+      Logger.error(`❌ 解析保存失败: ${href.tag}-${href.href}`);
+      Logger.error(e);
+    }
+  }
 };
 
 const beforeParse = async (connection: Connection, category: string, hasHistoryData: boolean) => {

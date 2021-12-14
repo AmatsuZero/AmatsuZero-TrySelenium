@@ -45,7 +45,7 @@ const resume = async (connection: Connection, start: number, pages: ThreadInfo[]
     } else if (pages.length > 0) {
       await specifiedPages(connection, pages);
     } else {
-      await parseNewListPage(connection, startpage, hasHistoryData);
+      // await parseNewListPage(connection, startpage, hasHistoryData);
       await parseACGListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {

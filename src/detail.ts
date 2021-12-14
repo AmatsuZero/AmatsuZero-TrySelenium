@@ -35,19 +35,23 @@ export default class DetailPage {
       await this.findTorrentLink(detail, driver); // 提取种子链接
       return detail;
     } catch (e) {
-      const info = e as { name: string };
+      await this.handleException(e, driver);
+    } finally {
+      await driver.close();
+    }
+  }
+
+  protected async handleException(e: any, driver: WebDriver) {
+    const info = e as { name: string };
       if (info.name === "NoSuchElementError" && this.retryCount < MaxRetryCount) {
         this.retryCount += 1;
         Logger.log(`❌ 提取页面信息失败, 第 ${this.retryCount} 次重试: ${this.href}`);
-        driver.sleep(SleepTime); // sleep 1s 后重试
-        this.extractInfo();
+        await driver.sleep(SleepTime); // sleep 1s 后重试
+        await this.extractInfo();
       } else {
         Logger.log(`❌ 提取页面信息失败: ${this.tag}-${this.href}`);
         Logger.error(e);
       }
-    } finally {
-      await driver.close();
-    }
   }
 
   protected async findTorrentLink(model: InfoModel, driver: WebDriver, pageLink = "") {
