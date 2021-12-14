@@ -1,4 +1,4 @@
-import { Connection } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { NewListPage, ThreadInfo } from './newlist';
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
@@ -6,8 +6,7 @@ import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
 import ACGDetailPage from './acgdetail';
 
-const parseNewlistData = async (connection: Connection, hrefs: ThreadInfo[]) => {
-  const repo = connection.getRepository(InfoModel);
+const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
     Logger.log(`🔍 即将解析详情页面：${href.href}`);
     const detail = new DetailPage(href.href, href.tag);
@@ -26,8 +25,7 @@ const parseNewlistData = async (connection: Connection, hrefs: ThreadInfo[]) => 
   }
 };
 
-const parseACGListData = async (connection: Connection, hrefs: ThreadInfo[]) => {
-  const repo = connection.getRepository(InfoModel);
+const parseACGListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
     Logger.log(`🔍 即将解析详情页面：${href.href}`);
     const detail = new ACGDetailPage(href.href, href.tag);
@@ -91,7 +89,9 @@ const parseNewListPage = async (connection: Connection, startPage: number, hasHi
   Logger.log('✨ 开始解析新作品列表');
   const newListPage = new NewListPage(host, latestId, earliestId);
   newListPage.currentPage = startPage;
-  await newListPage.getAllThreadLinks(async (hrefs) => parseNewlistData(connection, hrefs));
+  const repo = connection.getRepository(InfoModel);
+  newListPage.dbRepo = repo;
+  await newListPage.getAllThreadLinks(async (hrefs) => parseNewlistData(repo, hrefs));
   Logger.log('✨ 解析新作品列表结束');
 };
 
@@ -99,8 +99,9 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
   const { host, latestId, earliestId } = await beforeParse(connection, "acg", hasHistoryData);
   Logger.log('✨ 开始解析 ACG 列表');
   const acgList = new ACGList(host, latestId, earliestId);
+  const repo = connection.getRepository(InfoModel);
   acgList.currentPage = startPage;
-  await acgList.getAllThreadLinks(async (hrefs) => parseACGListData(connection, hrefs));
+  await acgList.getAllThreadLinks(async (hrefs) => parseACGListData(repo, hrefs));
   Logger.log('✨ 解析 ACG 列表结束');
 };
 

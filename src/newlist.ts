@@ -1,5 +1,7 @@
 import { WebDriver, By, WebElement } from "selenium-webdriver";
+import { Repository } from "typeorm";
 import { URL } from "url";
+import { InfoModel } from "./entity/info";
 import { getThreadId, Logger, makeBrowser, PageCode, ShouldCountinue, SISPaths } from "./util";
 
 class ThreadInfo {
@@ -39,6 +41,7 @@ class NewListPage {
   public driver?: WebDriver;
   public latestId: number;
   public earliestid: number;
+  public dbRepo?: Repository<InfoModel>;
 
   public constructor(host: string, latestId: number, earliestid: number) {
     this.host = host;

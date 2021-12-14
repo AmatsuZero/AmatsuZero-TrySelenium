@@ -39,6 +39,7 @@
       "env":{
         "NODE_ENV": "DEBUG"
       },
+      "runtimeVersion": "12.22.7",
     },
     {
       "name": "Scripts",

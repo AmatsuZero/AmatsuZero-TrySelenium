@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from "path";
 import { Connection, createConnection } from "typeorm";
 import { Logger, parseInitArgs } from './util';
-import { parseACGListPage, parseNewlistData, parseNewListPage } from './route';
+import { parseNewlistData, parseNewListPage } from './route';
 import { ThreadInfo } from './newlist';
+import { InfoModel } from './entity/info';
 
 const prepareConnection = async () => {
   Logger.log("💻 准备创建数据库链接");
@@ -18,7 +19,8 @@ const prepareConnection = async () => {
 
 const specifiedPages = async (connection: Connection, pages: ThreadInfo[]) => {
   Logger.log("🔧 开始解析单独页面");
-  await parseNewlistData(connection, pages);
+  const repo = connection.getRepository(InfoModel);
+  await parseNewlistData(repo, pages);
 };
 
 const resume = async (connection: Connection, start: number, pages: ThreadInfo[]) => {
@@ -45,8 +47,8 @@ const resume = async (connection: Connection, start: number, pages: ThreadInfo[]
     } else if (pages.length > 0) {
       await specifiedPages(connection, pages);
     } else {
-      // await parseNewListPage(connection, startpage, hasHistoryData);
-      await parseACGListPage(connection, startpage, hasHistoryData);
+      await parseNewListPage(connection, startpage, hasHistoryData);
+      // await parseACGListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');

@@ -10,7 +10,7 @@
       "debug": "ts-node src/main.ts",
       "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
       "lint": "eslint --fix src --ext .ts",
-      "start": "nvm use && yarn build && node --trace-warnings dist/main.js"
+      "start": "yarn build && node --trace-warnings dist/main.js"
    },
    "husky": {
       "hooks": {
