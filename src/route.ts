@@ -105,8 +105,18 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
   Logger.log('✨ 解析 ACG 列表结束');
 };
 
+const updateNewTags = async (connection: Connection) => {
+  const host = await findAvailableHost();
+  const newListPage = new NewListPage(host, 0, 0);
+  newListPage.dbRepo = connection.getRepository(InfoModel);
+  Logger.log('✨ 开始更新新列表标签');
+  await newListPage.updateTags();
+  Logger.log('✨ 更新新列表标签结束');
+}
+
 export {
   parseNewlistData,
   parseNewListPage,
   parseACGListPage,
+  updateNewTags,
 }

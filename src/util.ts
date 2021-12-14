@@ -126,6 +126,7 @@ const parseInitArgs = async () => {
   let startpage = 1
   let pages: ThreadInfo[] = [];
   let isResume = false;
+  let isUpdateTags = false;
   // 检查起始页码
   for (const arg of process.argv) {
     if (arg.startsWith("--page")) {
@@ -137,10 +138,12 @@ const parseInitArgs = async () => {
       pages = value.retryPages;
     } else if (arg.startsWith("--single")) {
       pages = arg.split("")[1].split(",").map(page => new ThreadInfo(page, ""));
+    } else if (arg.startsWith("--updateTags")) {
+      isUpdateTags = true;
     }
   }
   createLogger();
-  return { startpage, pages, isResume };
+  return { startpage, pages, isResume, isUpdateTags };
 };
 
 const createLogger = () => {

@@ -64,6 +64,35 @@ class NewListPage {
     this.destroy();
   }
 
+  public async updateTags() {
+    if (this.dbRepo === undefined) {
+      return;
+    }
+    const total = await this.dbRepo.count();
+    let cnt = 0;
+    do {
+      try {
+        let links = await this.getAllThreadsOnCurrentPage();
+        links = links.filter(link => link.tag.length > 0);
+        for (const link of links) {
+          const threadId = getThreadId(link.href);
+          const model = await this.dbRepo.findOne({ threadId });
+          if (model !== undefined) {
+            model.tag = link.tag;
+            cnt += 1;
+            await this.dbRepo.save(model);
+          }
+        }
+        await this.nextPage();
+      } catch (e) {
+        ShouldCountinue();
+        Logger.log("❌ 更新标签失败");
+        Logger.error(e);
+      }
+    } while (cnt <= total)
+    this.destroy();
+  }
+
   public async getAllThreadsOnCurrentPage(needClose = false) {
     if (this.driver === undefined) {
       this.driver = await makeBrowser();

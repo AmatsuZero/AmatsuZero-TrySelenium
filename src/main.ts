@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from "path";
 import { Connection, createConnection } from "typeorm";
 import { Logger, parseInitArgs } from './util';
-import { parseNewlistData, parseNewListPage } from './route';
+import { parseNewlistData, parseNewListPage, updateNewTags } from './route';
 import { ThreadInfo } from './newlist';
 import { InfoModel } from './entity/info';
 
@@ -38,11 +38,13 @@ const resume = async (connection: Connection, start: number, pages: ThreadInfo[]
 };
 
 (async () => {
-  const { startpage, pages, isResume } = await parseInitArgs();
+  const { startpage, pages, isResume, isUpdateTags } = await parseInitArgs();
   Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
   const { connection, hasHistoryData } = await prepareConnection();
   try {
-    if (isResume) {
+    if (isUpdateTags) {
+      await updateNewTags(connection);
+    } else if (isResume) {
       await resume(connection, startpage, pages);
     } else if (pages.length > 0) {
       await specifiedPages(connection, pages);
