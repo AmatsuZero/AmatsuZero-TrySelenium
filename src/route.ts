@@ -106,8 +106,8 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
 };
 
 const updateNewTags = async (connection: Connection) => {
-  const host = await findAvailableHost();
-  const newListPage = new NewListPage(host, 0, 0);
+  const { host, latestId, earliestId } = await beforeParse(connection, "new", true);
+  const newListPage = new NewListPage(host, latestId, earliestId);
   newListPage.dbRepo = connection.getRepository(InfoModel);
   Logger.log('✨ 开始更新新列表标签');
   await newListPage.updateTags();

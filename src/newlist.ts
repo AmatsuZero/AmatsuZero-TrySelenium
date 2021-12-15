@@ -68,8 +68,7 @@ class NewListPage {
     if (this.dbRepo === undefined) {
       return;
     }
-    const total = await this.dbRepo.count();
-    let cnt = 0;
+    let modelId = this.latestId;
     do {
       try {
         let links = await this.getAllThreadsOnCurrentPage();
@@ -78,8 +77,8 @@ class NewListPage {
           const threadId = getThreadId(link.href);
           const model = await this.dbRepo.findOne({ threadId });
           if (model !== undefined) {
+            modelId = model.threadId;
             model.tag = link.tag;
-            cnt += 1;
             await this.dbRepo.save(model);
           }
         }
@@ -89,7 +88,7 @@ class NewListPage {
         Logger.log("❌ 更新标签失败");
         Logger.error(e);
       }
-    } while (cnt <= total)
+    } while (modelId > this.earliestid)
     this.destroy();
   }
 
