@@ -17,9 +17,11 @@ import dotenv from "dotenv";
 import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
 import { ExtensionContext } from 'vscode';
+import { promisify } from 'util';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const logPath = path.join(__dirname, '..', 'log.txt');
+const mkdir = promisify(fs.mkdir);
 
 const PageCode = {
   NEW: 'forum-561',
@@ -222,12 +224,41 @@ const ShouldCountinue = () => {
 
 const prepareConnection = async (ctx?: ExtensionContext) => {
   Logger.log("💻 准备创建数据库链接");
-  const configPath = path.join(__dirname, '..', 'ormconfig.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const { database } = config;
-  const dataBasepath = path.join(__dirname, '..', database);
-  const hasHistoryData = fs.existsSync(dataBasepath);
-  const connection = await createConnection();
+  const databaseName = 'database.sqlite';
+  let database = "";
+  if (ctx !== undefined) {
+    let dir = ctx.globalStorageUri.fsPath;
+    if (!fs.existsSync(dir)) {
+      dir = path.normalize(path.join(dir, '..')); // 父文件夹一定存在
+      dir = path.join(dir, 'sis001-downloadwer-data');
+      if (!fs.existsSync(dir)) {
+        await mkdir(dir);
+      }
+    }
+    database = path.join(dir, databaseName);
+  } else {
+    database = path.join(__dirname, '..', 'data', databaseName);
+  }
+  const hasHistoryData = fs.existsSync(database);
+  const connection = await createConnection({
+    type: 'sqlite',
+    database,
+    entities: [
+      __dirname + '/entity/**/*.{ts,js}',
+    ],
+    migrations: [
+      __dirname + '/migration/**/*.{ts,js}'
+    ],
+    subscribers: [
+      __dirname + '/subscriber/**/*.{ts,js}',
+    ],
+    migrationsTableName: 'info_model',
+    cli: {
+      entitiesDir: __dirname + "/entity",
+      migrationsDir: __dirname + "/migration",
+      subscribersDir: __dirname + "/subscriber"
+    }
+  });
   return { connection, hasHistoryData };
 };
 

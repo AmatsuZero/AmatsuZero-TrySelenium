@@ -3,12 +3,12 @@
    "version": "0.0.1",
    "engines": {
       "node": ">= 12.22.7",
-      "vscode": "^1.63.0"
+      "vscode": "^1.22.0"
    },
    "description": "",
    "main": "dist/extension/extension.js",
    "exports": {
-      ".": "./dist/main.js",
+      ".": "./dist/cli.js",
       "./extension": "./dist/extension/extension.js"
    },
    "categories": [
@@ -30,10 +30,10 @@
       "prebuild": "yarn lint",
       "build": "tsc",
       "watch": "tsc -watch",
-      "debug": "ts-node src/main.ts",
+      "debug": "ts-node src/cli.ts",
       "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
       "lint": "eslint --fix src --ext .ts",
-      "cli": "yarn build && node --trace-warnings dist/main.js",
+      "cli": "yarn build && node --trace-warnings dist/cli.js",
       "migration": "typeorm migration:run"
    },
    "husky": {
