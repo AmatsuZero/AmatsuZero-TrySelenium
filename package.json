@@ -1,17 +1,40 @@
 {
    "name": "sis001-downloader",
    "version": "0.0.1",
+   "engines": {
+      "node": ">= 12.22.7",
+      "vscode": "^1.63.0"
+   },
    "description": "",
-   "main": "dist/main.js",
+   "main": "dist/extension/extension.js",
+   "exports": {
+      ".": "./dist/main.js",
+      "./extension": "./dist/extension/extension.js"
+   },
+   "categories": [
+      "Other"
+   ],
+   "activationEvents": [
+      "onCommand:video-previewer.parseNewList"
+   ],
+   "contributes": {
+      "commands": [
+         {
+            "command": "video-previewer.parseNewList",
+            "title": "解析新作品列表"
+         }
+      ]
+   },
    "scripts": {
       "test": "jest",
       "prebuild": "yarn lint",
       "build": "tsc",
+      "watch": "tsc -watch",
       "debug": "ts-node src/main.ts",
       "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
       "lint": "eslint --fix src --ext .ts",
-      "start": "yarn build && node --trace-warnings dist/main.js",
-      "migration": "yarn typeorm migration:run"
+      "cli": "yarn build && node --trace-warnings dist/main.js",
+      "migration": "typeorm migration:run"
    },
    "husky": {
       "hooks": {
@@ -33,7 +56,7 @@
       "dotenv": "^10.0.0",
       "reflect-metadata": "^0.1.10",
       "selenium-webdriver": "^4.1.0",
-      "sqlite3": "^4.0.3",
+      "sqlite3": "^5.0.2",
       "typeorm": "0.2.41"
    },
    "devDependencies": {
@@ -44,8 +67,10 @@
       "@types/jest": "^27.0.3",
       "@types/node": "^16.11.11",
       "@types/selenium-webdriver": "^4.0.16",
+      "@types/vscode": "^1.63.0",
       "@typescript-eslint/eslint-plugin": "^5.5.0",
       "@typescript-eslint/parser": "^5.5.0",
+      "@vscode/test-electron": "^2.0.0",
       "babel-jest": "^27.4.2",
       "eslint": "^8.3.0",
       "eslint-config-alloy": "^4.4.0",

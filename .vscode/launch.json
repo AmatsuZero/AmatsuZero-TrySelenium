@@ -4,6 +4,7 @@
   // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "name": "Jest",
       "type": "pwa-node",
@@ -51,6 +52,21 @@
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": ["<node_internals>/**", "node_modules/**"]
-    }
+    },
+    {
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+      "program": "${workspaceFolder}/dist/extension/extension.js",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+      "env":{
+        "NODE_ENV": "DEBUG"
+      },
+		},
   ]
 }

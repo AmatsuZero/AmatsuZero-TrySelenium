@@ -114,9 +114,31 @@ const updateNewTags = async (connection: Connection) => {
   Logger.log('✨ 更新新列表标签结束');
 }
 
+const specifiedPages = async (connection: Connection, pages: ThreadInfo[]) => {
+  Logger.log("🔧 开始解析单独页面");
+  const repo = connection.getRepository(InfoModel);
+  await parseNewlistData(repo, pages);
+};
+
+const resume = async (connection: Connection, start: number, pages: ThreadInfo[]) => {
+  // 防止恢复页面中失败，进而丢失上次是恢复到第几页了，先打一个信息出来
+  if (start > 1) {
+    Logger.log(`🔧 从上次日志恢复：${start}`);
+  } else {
+    Logger.log("🔧 从上次日志恢复");
+  }
+  if (pages.length > 0) {
+    Logger.log(`🔧 要重新尝试下载的作品有：${pages.join("\n")}`);
+  }
+  await specifiedPages(connection, pages);
+  await parseNewListPage(connection, start, true);
+};
+
 export {
   parseNewlistData,
   parseNewListPage,
   parseACGListPage,
   updateNewTags,
+  specifiedPages,
+  resume,
 }

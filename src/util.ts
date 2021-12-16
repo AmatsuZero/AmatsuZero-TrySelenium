@@ -14,7 +14,9 @@ import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
 import dotenv from "dotenv";
+import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
+import { ExtensionContext } from 'vscode';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const logPath = path.join(__dirname, '..', 'log.txt');
@@ -46,16 +48,19 @@ const makeBrowser = async () => {
   options.addArguments("enable-automation");
   options.addArguments("start-maximized");
   const builder = new Builder().forBrowser(Browser.CHROME);
-  if(os.platform() === 'linux') {// linux 需要指定 driver 位置
-    const location = path.join(__dirname, "..", "env/linux", "chromedriver");
-    const serviceBuilder = new ServiceBuilder(location);
-    builder.setChromeService(serviceBuilder);
-
+  // vscode 插件下，chromedriver 路径也需要指定了
+  let location = '';
+  if (os.platform() === 'darwin') {
+    location = '/usr/local/bin/chromedriver'; // 通过 homebrew 安装的路径
+  } else if(os.platform() === 'linux') {// linux 需要指定 driver 位置
+    location = path.join(__dirname, "..", "env/linux", "chromedriver");
     // 额外设置
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu'");
     options.addArguments("--no-sandbox");
-  }
+  } 
+  const serviceBuilder = new ServiceBuilder(location);
+  builder.setChromeService(serviceBuilder);
   return await builder.setChromeOptions(options).build();
 }
 
@@ -146,11 +151,15 @@ const parseInitArgs = async () => {
   return { startpage, pages, isResume, isUpdateTags };
 };
 
-const createLogger = () => {
+const createLogger = (ctx?: ExtensionContext) => {
   if (process.env.NODE_ENV === "TEST" || process.env.NODE_ENV === "DEBUG") {
     Logger = console;
   } else {
-    const ws = fs.createWriteStream(logPath, {
+    let loggerPath = logPath;
+    if (ctx !== undefined) {
+      loggerPath = path.join(ctx.logUri.fsPath, 'log.txt');
+    }
+    const ws = fs.createWriteStream(loggerPath, {
       flags:'w', // 文件的打开模式
       mode:0o666, // 文件的权限设置
       encoding:'utf8', // 写入文件的字符的编码
@@ -211,6 +220,17 @@ const ShouldCountinue = () => {
   return !ans;
 }
 
+const prepareConnection = async (ctx?: ExtensionContext) => {
+  Logger.log("💻 准备创建数据库链接");
+  const configPath = path.join(__dirname, '..', 'ormconfig.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const { database } = config;
+  const dataBasepath = path.join(__dirname, '..', database);
+  const hasHistoryData = fs.existsSync(dataBasepath);
+  const connection = await createConnection();
+  return { connection, hasHistoryData };
+};
+
 export {
   makeBrowser,
   findAvailableHost,
@@ -220,4 +240,6 @@ export {
   Logger,
   parseInitArgs,
   ShouldCountinue,
+  prepareConnection,
+  createLogger
 }

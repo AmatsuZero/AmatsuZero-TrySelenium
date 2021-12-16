@@ -1328,6 +1328,11 @@
   resolved "http://r.tnpm.oa.com/@types%2fstack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
+"@types/vscode@^1.63.0":
+  version "1.63.0"
+  resolved "http://r.tnpm.oa.com/@types%2fvscode/-/vscode-1.63.0.tgz#3bddb5b79a93e8fcdd420bb00f7066658c79c70c"
+  integrity sha512-iePu1axOi5WSThV6l2TYcciBIpAlMarjBC8H0y8L8ocsZLxh7MttzwFU3pjoItF5fRVGxHS0Hsvje9jO3yJsfw==
+
 "@types/yargs-parser@*":
   version "20.2.1"
   resolved "http://r.tnpm.oa.com/@types%2fyargs-parser/-/yargs-parser-20.2.1.tgz#3b9ce2489919d9e4fea439b76916abc34b2df129"
@@ -1410,6 +1415,16 @@
     "@typescript-eslint/types" "5.5.0"
     eslint-visitor-keys "^3.0.0"
 
+"@vscode/test-electron@^2.0.0":
+  version "2.0.0"
+  resolved "http://r.tnpm.oa.com/@vscode%2ftest-electron/-/test-electron-2.0.0.tgz#4451eec8bc5b721c88e5bf39f1a43b0eec0fd8c7"
+  integrity sha512-DRHWriyETOA5SO4XktoMFpgsZWlVScSZYMeASYT/kp3vpIq8Yki2yLPNOxdd8qyqDPoF9oHGodQJWBbHnaYkeA==
+  dependencies:
+    http-proxy-agent "^4.0.1"
+    https-proxy-agent "^5.0.0"
+    rimraf "^3.0.2"
+    unzipper "^0.10.11"
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "http://r.tnpm.oa.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
@@ -1460,7 +1475,7 @@ agent-base@6:
   dependencies:
     debug "4"
 
-ajv@^6.10.0, ajv@^6.12.4:
+ajv@^6.10.0, ajv@^6.12.3, ajv@^6.12.4:
   version "6.12.6"
   resolved "http://r.tnpm.oa.com/ajv/-/ajv-6.12.6.tgz"
   integrity sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==
@@ -1564,10 +1579,32 @@ array-union@^2.1.0:
   resolved "http://r.tnpm.oa.com/array-union/-/array-union-2.1.0.tgz"
   integrity sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==
 
+asn1@~0.2.3:
+  version "0.2.6"
+  resolved "http://r.tnpm.oa.com/asn1/-/asn1-0.2.6.tgz#0d3a7bb6e64e02a90c0303b31f292868ea09a08d"
+  integrity sha512-ix/FxPn0MDjeyJ7i/yoHGFt/EX6LyNbxSEhPPXODPL+KB0VPk86UYfL0lMdy+KCnv+fmvIzySwaK5COwqVbWTQ==
+  dependencies:
+    safer-buffer "~2.1.0"
+
+assert-plus@1.0.0, assert-plus@^1.0.0:
+  version "1.0.0"
+  resolved "http://r.tnpm.oa.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
+  integrity sha1-8S4PPF13sLHN2RRpQuTpbB5N1SU=
+
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "http://r.tnpm.oa.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
+
+aws-sign2@~0.7.0:
+  version "0.7.0"
+  resolved "http://r.tnpm.oa.com/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
+  integrity sha1-tG6JCTSpWR8tL2+G1+ap8bP+dqg=
+
+aws4@^1.8.0:
+  version "1.11.0"
+  resolved "http://r.tnpm.oa.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
+  integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
 babel-jest@^27.4.2:
   version "27.4.2"
@@ -1671,6 +1708,38 @@ base64-js@^1.3.1:
   resolved "http://r.tnpm.oa.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
+bcrypt-pbkdf@^1.0.0:
+  version "1.0.2"
+  resolved "http://r.tnpm.oa.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.2.tgz#a4301d389b6a43f9b67ff3ca11a3f6637e360e9e"
+  integrity sha1-pDAdOJtqQ/m2f/PKEaP2Y342Dp4=
+  dependencies:
+    tweetnacl "^0.14.3"
+
+big-integer@^1.6.17:
+  version "1.6.51"
+  resolved "http://r.tnpm.oa.com/big-integer/-/big-integer-1.6.51.tgz#0df92a5d9880560d3ff2d5fd20245c889d130686"
+  integrity sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==
+
+binary@~0.3.0:
+  version "0.3.0"
+  resolved "http://r.tnpm.oa.com/binary/-/binary-0.3.0.tgz#9f60553bc5ce8c3386f3b553cff47462adecaa79"
+  integrity sha1-n2BVO8XOjDOG87VTz/R0Yq3sqnk=
+  dependencies:
+    buffers "~0.1.1"
+    chainsaw "~0.1.0"
+
+block-stream@*:
+  version "0.0.9"
+  resolved "http://r.tnpm.oa.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
+  integrity sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
+  dependencies:
+    inherits "~2.0.0"
+
+bluebird@~3.4.1:
+  version "3.4.7"
+  resolved "http://r.tnpm.oa.com/bluebird/-/bluebird-3.4.7.tgz#f72d760be09b7f76d08ed8fae98b289a8d05fab3"
+  integrity sha1-9y12C+Cbf3bQjtj66Ysomo0F+rM=
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "http://r.tnpm.oa.com/brace-expansion/-/brace-expansion-1.1.11.tgz"
@@ -1714,6 +1783,11 @@ buffer-from@^1.0.0:
   resolved "http://r.tnpm.oa.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
+buffer-indexof-polyfill@~1.0.0:
+  version "1.0.2"
+  resolved "http://r.tnpm.oa.com/buffer-indexof-polyfill/-/buffer-indexof-polyfill-1.0.2.tgz#d2732135c5999c64b277fcf9b1abe3498254729c"
+  integrity sha512-I7wzHwA3t1/lwXQh+A5PbNvJxgfo5r3xulgpYDB5zckTu/Z9oUK9biouBKQUjEqzaz3HnAT6TYoovmE+GqSf7A==
+
 buffer@^6.0.3:
   version "6.0.3"
   resolved "http://r.tnpm.oa.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
@@ -1721,6 +1795,11 @@ buffer@^6.0.3:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
+
+buffers@~0.1.1:
+  version "0.1.1"
+  resolved "http://r.tnpm.oa.com/buffers/-/buffers-0.1.1.tgz#b24579c3bed4d6d396aeee6d9a8ae7f5482ab7bb"
+  integrity sha1-skV5w77U1tOWru5tmorn9Ugqt7s=
 
 call-bind@^1.0.0:
   version "1.0.2"
@@ -1749,6 +1828,18 @@ caniuse-lite@^1.0.30001280:
   version "1.0.30001283"
   resolved "http://r.tnpm.oa.com/caniuse-lite/-/caniuse-lite-1.0.30001283.tgz#8573685bdae4d733ef18f78d44ba0ca5fe9e896b"
   integrity sha512-9RoKo841j1GQFSJz/nCXOj0sD7tHBtlowjYlrqIUS812x9/emfBLBt6IyMz1zIaYc/eRL8Cs6HPUVi2Hzq4sIg==
+
+caseless@~0.12.0:
+  version "0.12.0"
+  resolved "http://r.tnpm.oa.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
+  integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
+
+chainsaw@~0.1.0:
+  version "0.1.0"
+  resolved "http://r.tnpm.oa.com/chainsaw/-/chainsaw-0.1.0.tgz#5eab50b28afe58074d0d58291388828b5e5fbc98"
+  integrity sha1-XqtQsor+WAdNDVgpE4iCi15fvJg=
+  dependencies:
+    traverse ">=0.3.0 <0.4"
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -1847,7 +1938,7 @@ color-name@~1.1.4:
   resolved "http://r.tnpm.oa.com/color-name/-/color-name-1.1.4.tgz"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
-combined-stream@^1.0.8:
+combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
   version "1.0.8"
   resolved "http://r.tnpm.oa.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
@@ -1878,6 +1969,11 @@ core-js-compat@^3.18.0, core-js-compat@^3.19.1:
   dependencies:
     browserslist "^4.18.1"
     semver "7.0.0"
+
+core-util-is@1.0.2:
+  version "1.0.2"
+  resolved "http://r.tnpm.oa.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
+  integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
 core-util-is@~1.0.0:
   version "1.0.3"
@@ -1914,6 +2010,13 @@ cssstyle@^2.3.0:
   integrity sha512-AZL67abkUzIuvcHqk7c09cezpGNcxUxU4Ioi/05xHk4DQeTkWmGYftIE6ctU6AEt+Gn4n1lDStOtj7FKycP71A==
   dependencies:
     cssom "~0.3.6"
+
+dashdash@^1.12.0:
+  version "1.14.1"
+  resolved "http://r.tnpm.oa.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
+  integrity sha1-hTz6D3y+L+1d4gMmuN1YEDX24vA=
+  dependencies:
+    assert-plus "^1.0.0"
 
 data-urls@^2.0.0:
   version "2.0.0"
@@ -2030,6 +2133,21 @@ dotenv@^8.2.0:
   version "8.6.0"
   resolved "http://r.tnpm.oa.com/dotenv/-/dotenv-8.6.0.tgz#061af664d19f7f4d8fc6e4ff9b584ce237adcb8b"
   integrity sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==
+
+duplexer2@~0.1.4:
+  version "0.1.4"
+  resolved "http://r.tnpm.oa.com/duplexer2/-/duplexer2-0.1.4.tgz#8b12dab878c0d69e3e7891051662a32fc6bddcc1"
+  integrity sha1-ixLauHjA1p4+eJEFFmKjL8a93ME=
+  dependencies:
+    readable-stream "^2.0.2"
+
+ecc-jsbn@~0.1.1:
+  version "0.1.2"
+  resolved "http://r.tnpm.oa.com/ecc-jsbn/-/ecc-jsbn-0.1.2.tgz#3a83a904e54353287874c564b7549386849a98c9"
+  integrity sha1-OoOpBOVDUyh4dMVkt1SThoSamMk=
+  dependencies:
+    jsbn "~0.1.0"
+    safer-buffer "^2.1.0"
 
 electron-to-chromium@^1.3.896:
   version "1.4.8"
@@ -2249,6 +2367,21 @@ expect@^27.4.2:
     jest-message-util "^27.4.2"
     jest-regex-util "^27.4.0"
 
+extend@~3.0.2:
+  version "3.0.2"
+  resolved "http://r.tnpm.oa.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
+  integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
+
+extsprintf@1.3.0:
+  version "1.3.0"
+  resolved "http://r.tnpm.oa.com/extsprintf/-/extsprintf-1.3.0.tgz#96918440e3041a7a414f8c52e3c574eb3c3e1e05"
+  integrity sha1-lpGEQOMEGnpBT4xS48V06zw+HgU=
+
+extsprintf@^1.2.0:
+  version "1.4.1"
+  resolved "http://r.tnpm.oa.com/extsprintf/-/extsprintf-1.4.1.tgz#8d172c064867f235c0c84a596806d279bf4bcc07"
+  integrity sha512-Wrk35e8ydCKDj/ArClo1VrPVmN8zph5V4AtHwIuHhvMXsKf73UT3BOD+azBIW+3wOJ4FhEH7zyaJCFvChjYvMA==
+
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
   resolved "http://r.tnpm.oa.com/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
@@ -2324,6 +2457,11 @@ flatted@^3.1.0:
   resolved "http://r.tnpm.oa.com/flatted/-/flatted-3.2.4.tgz"
   integrity sha512-8/sOawo8tJ4QOBX8YlQBMxL8+RLZfxMQOif9o0KUKTNTjMYElWPE0r/m5VNFxTRd0NSw8qSy8dajrwX4RYI1Hw==
 
+forever-agent@~0.6.1:
+  version "0.6.1"
+  resolved "http://r.tnpm.oa.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
+  integrity sha1-+8cfDEGt6zf5bFd60e1C2P2sypE=
+
 form-data@^3.0.0:
   version "3.0.1"
   resolved "http://r.tnpm.oa.com/form-data/-/form-data-3.0.1.tgz#ebd53791b78356a99af9a300d4282c4d5eb9755f"
@@ -2331,6 +2469,15 @@ form-data@^3.0.0:
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
+    mime-types "^2.1.12"
+
+form-data@~2.3.2:
+  version "2.3.3"
+  resolved "http://r.tnpm.oa.com/form-data/-/form-data-2.3.3.tgz#dcce52c05f644f298c6a7ab936bd724ceffbf3a6"
+  integrity sha512-1lLKB2Mu3aGP1Q/2eCOx0fNbRMe7XdwktwOruhfqqd0rIJWwN4Dh+E3hrPSlDCXnSR7UtZ1N38rVXm+6+MEhJQ==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
 fs-minipass@^1.2.7:
@@ -2349,6 +2496,16 @@ fsevents@^2.3.2:
   version "2.3.2"
   resolved "http://r.tnpm.oa.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
+
+fstream@^1.0.0, fstream@^1.0.12:
+  version "1.0.12"
+  resolved "http://r.tnpm.oa.com/fstream/-/fstream-1.0.12.tgz#4e8ba8ee2d48be4f7d0de505455548eae5932045"
+  integrity sha512-WvJ193OHa0GHPEL+AycEJgxvBEwyfRkN1vhjca23OaPVMCaLCXTd5qAu82AjTcgP1UJmytkOKb63Ypde7raDIg==
+  dependencies:
+    graceful-fs "^4.1.2"
+    inherits "~2.0.0"
+    mkdirp ">=0.5 0"
+    rimraf "2"
 
 function-bind@^1.1.1:
   version "1.1.1"
@@ -2403,6 +2560,13 @@ get-stream@^6.0.0:
   resolved "http://r.tnpm.oa.com/get-stream/-/get-stream-6.0.1.tgz#a262d8eef67aced57c2852ad6167526a43cbf7b7"
   integrity sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==
 
+getpass@^0.1.1:
+  version "0.1.7"
+  resolved "http://r.tnpm.oa.com/getpass/-/getpass-0.1.7.tgz#5eff8e3e684d569ae4cb2b1282604e8ba62149fa"
+  integrity sha1-Xv+OPmhNVprkyysSgmBOi6YhSfo=
+  dependencies:
+    assert-plus "^1.0.0"
+
 glob-parent@^5.1.2:
   version "5.1.2"
   resolved "http://r.tnpm.oa.com/glob-parent/-/glob-parent-5.1.2.tgz"
@@ -2417,7 +2581,7 @@ glob-parent@^6.0.1:
   dependencies:
     is-glob "^4.0.3"
 
-glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
+glob@^7.0.3, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.2.0"
   resolved "http://r.tnpm.oa.com/glob/-/glob-7.2.0.tgz"
   integrity sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==
@@ -2453,10 +2617,23 @@ globby@^11.0.4:
     merge2 "^1.3.0"
     slash "^3.0.0"
 
-graceful-fs@^4.2.4:
+graceful-fs@^4.1.2, graceful-fs@^4.2.2, graceful-fs@^4.2.4:
   version "4.2.8"
   resolved "http://r.tnpm.oa.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
+
+har-schema@^2.0.0:
+  version "2.0.0"
+  resolved "http://r.tnpm.oa.com/har-schema/-/har-schema-2.0.0.tgz#a94c2224ebcac04782a0d9035521f24735b7ec92"
+  integrity sha1-qUwiJOvKwEeCoNkDVSHyRzW37JI=
+
+har-validator@~5.1.3:
+  version "5.1.5"
+  resolved "http://r.tnpm.oa.com/har-validator/-/har-validator-5.1.5.tgz#1f0803b9f8cb20c0fa13822df1ecddb36bde1efd"
+  integrity sha512-nmT2T0lljbxdQZfspsno9hgrG3Uir6Ks5afism62poxqBM6sDnMEuPmzTq8XN0OEwqKLLdh1jQI3qyE66Nzb3w==
+  dependencies:
+    ajv "^6.12.3"
+    har-schema "^2.0.0"
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -2510,6 +2687,15 @@ http-proxy-agent@^4.0.1:
     "@tootallnate/once" "1"
     agent-base "6"
     debug "4"
+
+http-signature@~1.2.0:
+  version "1.2.0"
+  resolved "http://r.tnpm.oa.com/http-signature/-/http-signature-1.2.0.tgz#9aecd925114772f3d95b65a60abb8f7c18fbace1"
+  integrity sha1-muzZJRFHcvPZW2WmCruPfBj7rOE=
+  dependencies:
+    assert-plus "^1.0.0"
+    jsprim "^1.2.2"
+    sshpk "^1.7.0"
 
 https-proxy-agent@^5.0.0:
   version "5.0.0"
@@ -2592,7 +2778,7 @@ inflight@^1.0.4:
     once "^1.3.0"
     wrappy "1"
 
-inherits@2, inherits@^2.0.1, inherits@~2.0.3:
+inherits@2, inherits@^2.0.1, inherits@~2.0.0, inherits@~2.0.3:
   version "2.0.4"
   resolved "http://r.tnpm.oa.com/inherits/-/inherits-2.0.4.tgz"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
@@ -2653,7 +2839,7 @@ is-stream@^2.0.0:
   resolved "http://r.tnpm.oa.com/is-stream/-/is-stream-2.0.1.tgz#fac1e3d53b97ad5a9d0ae9cef2389f5810a5c077"
   integrity sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==
 
-is-typedarray@^1.0.0:
+is-typedarray@^1.0.0, is-typedarray@~1.0.0:
   version "1.0.0"
   resolved "http://r.tnpm.oa.com/is-typedarray/-/is-typedarray-1.0.0.tgz#e479c80858df0c1b11ddda6940f96011fcda4a9a"
   integrity sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=
@@ -2667,6 +2853,11 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "http://r.tnpm.oa.com/isexe/-/isexe-2.0.0.tgz"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
+
+isstream@~0.1.2:
+  version "0.1.2"
+  resolved "http://r.tnpm.oa.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
+  integrity sha1-R+Y/evVa+m+S4VAOaQ64uFKcCZo=
 
 istanbul-lib-coverage@^3.0.0, istanbul-lib-coverage@^3.2.0:
   version "3.2.0"
@@ -3151,6 +3342,11 @@ js-yaml@^4.0.0, js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
+jsbn@~0.1.0:
+  version "0.1.1"
+  resolved "http://r.tnpm.oa.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
+  integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
+
 jsdom@^16.6.0:
   version "16.7.0"
   resolved "http://r.tnpm.oa.com/jsdom/-/jsdom-16.7.0.tgz#918ae71965424b197c819f8183a754e18977b710"
@@ -3199,10 +3395,20 @@ json-schema-traverse@^0.4.1:
   resolved "http://r.tnpm.oa.com/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz"
   integrity sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==
 
+json-schema@0.4.0:
+  version "0.4.0"
+  resolved "http://r.tnpm.oa.com/json-schema/-/json-schema-0.4.0.tgz#f7de4cf6efab838ebaeb3236474cbba5a1930ab5"
+  integrity sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==
+
 json-stable-stringify-without-jsonify@^1.0.1:
   version "1.0.1"
   resolved "http://r.tnpm.oa.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz"
   integrity sha1-nbe1lJatPzz+8wp1FC0tkwrXJlE=
+
+json-stringify-safe@~5.0.1:
+  version "5.0.1"
+  resolved "http://r.tnpm.oa.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
+  integrity sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=
 
 json5@^2.1.2:
   version "2.2.0"
@@ -3210,6 +3416,16 @@ json5@^2.1.2:
   integrity sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA==
   dependencies:
     minimist "^1.2.5"
+
+jsprim@^1.2.2:
+  version "1.4.2"
+  resolved "http://r.tnpm.oa.com/jsprim/-/jsprim-1.4.2.tgz#712c65533a15c878ba59e9ed5f0e26d5b77c5feb"
+  integrity sha512-P2bSOMAc/ciLz6DzgjVlGJP9+BrJWu5UDGK70C2iweC5QBIeFf0ZXRvGjEj2uYgrY2MkAAhsSWHDWlFtEroZWw==
+  dependencies:
+    assert-plus "1.0.0"
+    extsprintf "1.3.0"
+    json-schema "0.4.0"
+    verror "1.10.0"
 
 jszip@^3.6.0:
   version "3.7.1"
@@ -3253,6 +3469,11 @@ lie@~3.3.0:
   integrity sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==
   dependencies:
     immediate "~3.0.5"
+
+listenercount@~1.0.1:
+  version "1.0.1"
+  resolved "http://r.tnpm.oa.com/listenercount/-/listenercount-1.0.1.tgz#84c8a72ab59c4725321480c975e6508342e70937"
+  integrity sha1-hMinKrWcRyUyFIDJdeZQg0LnCTc=
 
 locate-path@^5.0.0:
   version "5.0.0"
@@ -3325,7 +3546,7 @@ mime-db@1.51.0:
   resolved "http://r.tnpm.oa.com/mime-db/-/mime-db-1.51.0.tgz#d9ff62451859b18342d960850dc3cfb77e63fb0c"
   integrity sha512-5y8A56jg7XVQx2mbv1lu49NR4dokRnhZYTtL+KGfaa27uq4pSTXkwQkFJl4pkRMyNFz/EtYDSkiiEHx3F7UN6g==
 
-mime-types@^2.1.12:
+mime-types@^2.1.12, mime-types@~2.1.19:
   version "2.1.34"
   resolved "http://r.tnpm.oa.com/mime-types/-/mime-types-2.1.34.tgz#5a712f9ec1503511a945803640fafe09d3793c24"
   integrity sha512-6cP692WwGIs9XXdOO4++N+7qjqv0rqxxVvJ3VHPh/Sc9mVZcQP+ZGhkKiTvWMQRr2tbHkJP/Yn7Y0npb3ZBs4A==
@@ -3364,7 +3585,7 @@ minizlib@^1.3.3:
   dependencies:
     minipass "^2.9.0"
 
-mkdirp@^0.5.1, mkdirp@^0.5.5:
+"mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@^0.5.5:
   version "0.5.5"
   resolved "http://r.tnpm.oa.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
@@ -3395,11 +3616,6 @@ mz@^2.4.0:
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
 
-nan@^2.12.1:
-  version "2.15.0"
-  resolved "http://r.tnpm.oa.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
-  integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
-
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "http://r.tnpm.oa.com/natural-compare/-/natural-compare-1.4.0.tgz"
@@ -3414,12 +3630,35 @@ needle@^2.2.1:
     iconv-lite "^0.4.4"
     sax "^1.2.4"
 
+node-addon-api@^3.0.0:
+  version "3.2.1"
+  resolved "http://r.tnpm.oa.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
+  integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
+
 node-fetch@^2.6.1:
   version "2.6.6"
   resolved "https://mirrors.tencent.com/npm/node-fetch/-/node-fetch-2.6.6.tgz#1751a7c01834e8e1697758732e9efb6eeadfaf89"
   integrity sha512-Z8/6vRlTUChSdIgMa51jxQ4lrw/Jy5SOW10ObaA47/RElsAN2c5Pn8bTgFGWn/ibwzXTE8qwr1Yzx28vsecXEA==
   dependencies:
     whatwg-url "^5.0.0"
+
+node-gyp@3.x:
+  version "3.8.0"
+  resolved "http://r.tnpm.oa.com/node-gyp/-/node-gyp-3.8.0.tgz#540304261c330e80d0d5edce253a68cb3964218c"
+  integrity sha512-3g8lYefrRRzvGeSowdJKAKyks8oUpLEd/DyPV4eMhVlhJ0aNaZqIrNUIPuEWWTAoPqyFkfGrM67MC69baqn6vA==
+  dependencies:
+    fstream "^1.0.0"
+    glob "^7.0.3"
+    graceful-fs "^4.1.2"
+    mkdirp "^0.5.0"
+    nopt "2 || 3"
+    npmlog "0 || 1 || 2 || 3 || 4"
+    osenv "0"
+    request "^2.87.0"
+    rimraf "2"
+    semver "~5.3.0"
+    tar "^2.0.0"
+    which "1"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -3451,6 +3690,13 @@ node-releases@^2.0.1:
   version "2.0.1"
   resolved "http://r.tnpm.oa.com/node-releases/-/node-releases-2.0.1.tgz#3d1d395f204f1f2f29a54358b9fb678765ad2fc5"
   integrity sha512-CqyzN6z7Q6aMeF/ktcMVTzhAHCEpf8SOarwpzpf8pNBY2k5/oM34UHldUwp8VKI7uxct2HxSRdJjBaZeESzcxA==
+
+"nopt@2 || 3":
+  version "3.0.6"
+  resolved "http://r.tnpm.oa.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
+  integrity sha1-xkZdvwirzU2zWTF/eaxopkayj/k=
+  dependencies:
+    abbrev "1"
 
 nopt@^4.0.1:
   version "4.0.3"
@@ -3493,7 +3739,7 @@ npm-run-path@^4.0.1:
   dependencies:
     path-key "^3.0.0"
 
-npmlog@^4.0.2:
+"npmlog@0 || 1 || 2 || 3 || 4", npmlog@^4.0.2:
   version "4.1.2"
   resolved "http://r.tnpm.oa.com/npmlog/-/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b"
   integrity sha512-2uUqazuKlTaSI/dC8AzicUck7+IrEaOnN/e0jd3Xtt1KcGpwx30v50mL7oPyr/h9bL3E4aZccVwpwP+5W9Vjkg==
@@ -3512,6 +3758,11 @@ nwsapi@^2.2.0:
   version "2.2.0"
   resolved "http://r.tnpm.oa.com/nwsapi/-/nwsapi-2.2.0.tgz#204879a9e3d068ff2a55139c2c772780681a38b7"
   integrity sha512-h2AatdwYH+JHiZpv7pt/gSX1XoRGb7L/qSIeuqA6GwYoF9w1vP1cw42TO0aI2pNyshRK5893hNSl+1//vHK7hQ==
+
+oauth-sign@~0.9.0:
+  version "0.9.0"
+  resolved "http://r.tnpm.oa.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
+  integrity sha512-fexhUFFPTGV8ybAtSIGbV6gOkSv8UtRbDBnAyLQw4QPKkgNlsH2ByPGtMUqdWkos6YCRmAqViwgZrJc/mRDzZQ==
 
 object-assign@^4.0.1, object-assign@^4.1.0:
   version "4.1.1"
@@ -3581,7 +3832,7 @@ os-tmpdir@^1.0.0:
   resolved "http://r.tnpm.oa.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
 
-osenv@^0.1.4:
+osenv@0, osenv@^0.1.4:
   version "0.1.5"
   resolved "http://r.tnpm.oa.com/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
   integrity sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==
@@ -3662,6 +3913,11 @@ path-type@^4.0.0:
   resolved "http://r.tnpm.oa.com/path-type/-/path-type-4.0.0.tgz"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
+performance-now@^2.1.0:
+  version "2.1.0"
+  resolved "http://r.tnpm.oa.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
+  integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "http://r.tnpm.oa.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
@@ -3724,7 +3980,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-psl@^1.1.33:
+psl@^1.1.28, psl@^1.1.33:
   version "1.8.0"
   resolved "http://r.tnpm.oa.com/psl/-/psl-1.8.0.tgz#9326f8bcfb013adcc005fdff056acce020e51c24"
   integrity sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==
@@ -3733,6 +3989,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   version "2.1.1"
   resolved "http://r.tnpm.oa.com/punycode/-/punycode-2.1.1.tgz"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+
+qs@~6.5.2:
+  version "6.5.2"
+  resolved "http://r.tnpm.oa.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
+  integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
@@ -3754,7 +4015,7 @@ react-is@^17.0.1:
   resolved "http://r.tnpm.oa.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-readable-stream@^2.0.6, readable-stream@~2.3.6:
+readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@~2.3.6:
   version "2.3.7"
   resolved "http://r.tnpm.oa.com/readable-stream/-/readable-stream-2.3.7.tgz"
   integrity sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==
@@ -3825,6 +4086,32 @@ regjsparser@^0.7.0:
   dependencies:
     jsesc "~0.5.0"
 
+request@^2.87.0:
+  version "2.88.2"
+  resolved "http://r.tnpm.oa.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
+  integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
+  dependencies:
+    aws-sign2 "~0.7.0"
+    aws4 "^1.8.0"
+    caseless "~0.12.0"
+    combined-stream "~1.0.6"
+    extend "~3.0.2"
+    forever-agent "~0.6.1"
+    form-data "~2.3.2"
+    har-validator "~5.1.3"
+    http-signature "~1.2.0"
+    is-typedarray "~1.0.0"
+    isstream "~0.1.2"
+    json-stringify-safe "~5.0.1"
+    mime-types "~2.1.19"
+    oauth-sign "~0.9.0"
+    performance-now "^2.1.0"
+    qs "~6.5.2"
+    safe-buffer "^5.1.2"
+    tough-cookie "~2.5.0"
+    tunnel-agent "^0.6.0"
+    uuid "^3.3.2"
+
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "http://r.tnpm.oa.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
@@ -3865,7 +4152,7 @@ reusify@^1.0.4:
   resolved "http://r.tnpm.oa.com/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
-rimraf@^2.6.1:
+rimraf@2, rimraf@^2.6.1:
   version "2.7.1"
   resolved "http://r.tnpm.oa.com/rimraf/-/rimraf-2.7.1.tgz#35797f13a7fdadc566142c29d4f07ccad483e3ec"
   integrity sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==
@@ -3896,7 +4183,7 @@ safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   resolved "http://r.tnpm.oa.com/safe-buffer/-/safe-buffer-5.1.2.tgz"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
 
-"safer-buffer@>= 2.1.2 < 3":
+"safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "2.1.2"
   resolved "http://r.tnpm.oa.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
@@ -3944,6 +4231,11 @@ semver@^7.2.1, semver@^7.3.2, semver@^7.3.5:
   dependencies:
     lru-cache "^6.0.0"
 
+semver@~5.3.0:
+  version "5.3.0"
+  resolved "http://r.tnpm.oa.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
+  integrity sha1-myzl094C0XxgEq0yaqa00M9U+U8=
+
 set-blocking@~2.0.0:
   version "2.0.0"
   resolved "http://r.tnpm.oa.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
@@ -3953,6 +4245,11 @@ set-immediate-shim@~1.0.1:
   version "1.0.1"
   resolved "http://r.tnpm.oa.com/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz"
   integrity sha1-SysbJ+uAip+NzEgaWOXlb1mfP2E=
+
+setimmediate@~1.0.4:
+  version "1.0.5"
+  resolved "http://r.tnpm.oa.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
 
 sha.js@^2.4.11:
   version "2.4.11"
@@ -4017,13 +4314,30 @@ sprintf-js@~1.0.2:
   resolved "http://r.tnpm.oa.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
-sqlite3@^4.0.3:
-  version "4.2.0"
-  resolved "http://r.tnpm.oa.com/sqlite3/-/sqlite3-4.2.0.tgz#49026d665e9fc4f922e56fb9711ba5b4c85c4901"
-  integrity sha512-roEOz41hxui2Q7uYnWsjMOTry6TcNUNmp8audCx18gF10P2NknwdpF+E+HKvz/F2NvPKGGBF4NGc+ZPQ+AABwg==
+sqlite3@^5.0.2:
+  version "5.0.2"
+  resolved "http://r.tnpm.oa.com/sqlite3/-/sqlite3-5.0.2.tgz#00924adcc001c17686e0a6643b6cbbc2d3965083"
+  integrity sha512-1SdTNo+BVU211Xj1csWa8lV6KM0CtucDwRyA0VHl91wEH1Mgh7RxUpI4rVvG7OhHrzCSGaVyW5g8vKvlrk9DJA==
   dependencies:
-    nan "^2.12.1"
+    node-addon-api "^3.0.0"
     node-pre-gyp "^0.11.0"
+  optionalDependencies:
+    node-gyp "3.x"
+
+sshpk@^1.7.0:
+  version "1.16.1"
+  resolved "http://r.tnpm.oa.com/sshpk/-/sshpk-1.16.1.tgz#fb661c0bef29b39db40769ee39fa70093d6f6877"
+  integrity sha512-HXXqVUq7+pcKeLqqZj6mHFUMvXtOJt1uoUx09pFW6011inTMxqI8BA8PM95myrIyyKwdnzjdFjLiE6KBPVtJIg==
+  dependencies:
+    asn1 "~0.2.3"
+    assert-plus "^1.0.0"
+    bcrypt-pbkdf "^1.0.0"
+    dashdash "^1.12.0"
+    ecc-jsbn "~0.1.1"
+    getpass "^0.1.1"
+    jsbn "~0.1.0"
+    safer-buffer "^2.0.2"
+    tweetnacl "~0.14.0"
 
 stack-utils@^2.0.3:
   version "2.0.5"
@@ -4133,6 +4447,15 @@ symbol-tree@^3.2.4:
   resolved "http://r.tnpm.oa.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
+tar@^2.0.0:
+  version "2.2.2"
+  resolved "http://r.tnpm.oa.com/tar/-/tar-2.2.2.tgz#0ca8848562c7299b8b446ff6a4d60cdbb23edc40"
+  integrity sha512-FCEhQ/4rE1zYv9rYXJw/msRqsnmlje5jHP6huWeBZ704jUTy02c5AZyWujpMR1ax6mVw9NyJMfuK2CMDWVIfgA==
+  dependencies:
+    block-stream "*"
+    fstream "^1.0.12"
+    inherits "2"
+
 tar@^4:
   version "4.4.19"
   resolved "http://r.tnpm.oa.com/tar/-/tar-4.4.19.tgz#2e4d7263df26f2b914dee10c825ab132123742f3"
@@ -4220,6 +4543,14 @@ tough-cookie@^4.0.0:
     punycode "^2.1.1"
     universalify "^0.1.2"
 
+tough-cookie@~2.5.0:
+  version "2.5.0"
+  resolved "http://r.tnpm.oa.com/tough-cookie/-/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
+  integrity sha512-nlLsUzgm1kfLXSXfRZMc1KLAugd4hqJHDTvc2hDIwS3mZAfMEuMbc03SujMF+GEcpaX/qboeycw6iO8JwVv2+g==
+  dependencies:
+    psl "^1.1.28"
+    punycode "^2.1.1"
+
 tr46@^2.1.0:
   version "2.1.0"
   resolved "http://r.tnpm.oa.com/tr46/-/tr46-2.1.0.tgz#fa87aa81ca5d5941da8cbf1f9b749dc969a4e240"
@@ -4231,6 +4562,11 @@ tr46@~0.0.3:
   version "0.0.3"
   resolved "https://mirrors.tencent.com/npm/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
   integrity sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=
+
+"traverse@>=0.3.0 <0.4":
+  version "0.3.9"
+  resolved "http://r.tnpm.oa.com/traverse/-/traverse-0.3.9.tgz#717b8f220cc0bb7b44e40514c22b2e8bbc70d8b9"
+  integrity sha1-cXuPIgzAu3tE5AUUwisui7xw2Lk=
 
 ts-node@^10.4.0:
   version "10.4.0"
@@ -4266,6 +4602,18 @@ tsutils@^3.21.0:
   integrity sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==
   dependencies:
     tslib "^1.8.1"
+
+tunnel-agent@^0.6.0:
+  version "0.6.0"
+  resolved "http://r.tnpm.oa.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
+  integrity sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=
+  dependencies:
+    safe-buffer "^5.0.1"
+
+tweetnacl@^0.14.3, tweetnacl@~0.14.0:
+  version "0.14.5"
+  resolved "http://r.tnpm.oa.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
+  integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
@@ -4358,6 +4706,22 @@ universalify@^0.1.2:
   resolved "http://r.tnpm.oa.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
 
+unzipper@^0.10.11:
+  version "0.10.11"
+  resolved "http://r.tnpm.oa.com/unzipper/-/unzipper-0.10.11.tgz#0b4991446472cbdb92ee7403909f26c2419c782e"
+  integrity sha512-+BrAq2oFqWod5IESRjL3S8baohbevGcVA+teAIOYWM3pDVdseogqbzhhvvmiyQrUNKFUnDMtELW3X8ykbyDCJw==
+  dependencies:
+    big-integer "^1.6.17"
+    binary "~0.3.0"
+    bluebird "~3.4.1"
+    buffer-indexof-polyfill "~1.0.0"
+    duplexer2 "~0.1.4"
+    fstream "^1.0.12"
+    graceful-fs "^4.2.2"
+    listenercount "~1.0.1"
+    readable-stream "~2.3.6"
+    setimmediate "~1.0.4"
+
 uri-js@^4.2.2:
   version "4.4.1"
   resolved "http://r.tnpm.oa.com/uri-js/-/uri-js-4.4.1.tgz"
@@ -4369,6 +4733,11 @@ util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "http://r.tnpm.oa.com/util-deprecate/-/util-deprecate-1.0.2.tgz"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
+
+uuid@^3.3.2:
+  version "3.4.0"
+  resolved "http://r.tnpm.oa.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
+  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
 v8-compile-cache@^2.0.3:
   version "2.3.0"
@@ -4383,6 +4752,15 @@ v8-to-istanbul@^8.1.0:
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
     source-map "^0.7.3"
+
+verror@1.10.0:
+  version "1.10.0"
+  resolved "http://r.tnpm.oa.com/verror/-/verror-1.10.0.tgz#3a105ca17053af55d6e270c1f8288682e18da400"
+  integrity sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=
+  dependencies:
+    assert-plus "^1.0.0"
+    core-util-is "1.0.2"
+    extsprintf "^1.2.0"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
@@ -4448,6 +4826,13 @@ whatwg-url@^8.0.0, whatwg-url@^8.5.0:
     lodash "^4.7.0"
     tr46 "^2.1.0"
     webidl-conversions "^6.1.0"
+
+which@1:
+  version "1.3.1"
+  resolved "http://r.tnpm.oa.com/which/-/which-1.3.1.tgz#a45043d54f5805316da8d62f9f50918d3da70b0a"
+  integrity sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ==
+  dependencies:
+    isexe "^2.0.0"
 
 which@^2.0.1:
   version "2.0.2"
