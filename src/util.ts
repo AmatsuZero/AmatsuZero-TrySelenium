@@ -16,7 +16,7 @@ import { createInterface } from 'readline';
 import dotenv from "dotenv";
 import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, workspace } from 'vscode';
 import { promisify } from 'util';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
@@ -159,7 +159,10 @@ const createLogger = (ctx?: ExtensionContext) => {
   } else {
     let loggerPath = logPath;
     if (ctx !== undefined) {
-      loggerPath = path.join(ctx.logUri.fsPath, 'log.txt');
+      loggerPath = workspace.getConfiguration("sis001-downloader").get("logger") as string; // 先从配置获取位置
+      if (loggerPath === undefined || loggerPath.length === 0) {
+        loggerPath = path.join(ctx.logUri.fsPath, 'log.txt');
+      }
     }
     const ws = fs.createWriteStream(loggerPath, {
       flags:'w', // 文件的打开模式
@@ -227,7 +230,10 @@ const prepareConnection = async (ctx?: ExtensionContext) => {
   const databaseName = 'database.sqlite';
   let database = "";
   if (ctx !== undefined) {
-    let dir = ctx.globalStorageUri.fsPath;
+    let dir = workspace.getConfiguration("sis001-downloader").get("database") as string; // 先从配置获取位置
+    if (dir === undefined || dir.length === 0) {
+      dir = ctx.globalStorageUri.fsPath;
+    }
     if (!fs.existsSync(dir)) {
       dir = path.normalize(path.join(dir, '..')); // 父文件夹一定存在
       dir = path.join(dir, 'sis001-downloadwer-data');
@@ -257,7 +263,8 @@ const prepareConnection = async (ctx?: ExtensionContext) => {
       entitiesDir: __dirname + "/entity",
       migrationsDir: __dirname + "/migration",
       subscribersDir: __dirname + "/subscriber"
-    }
+    },
+    synchronize: true,
   });
   return { connection, hasHistoryData };
 };

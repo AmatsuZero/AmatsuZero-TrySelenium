@@ -33,7 +33,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/dist/main.js",
+      "program": "${workspaceFolder}/dist/cli.js",
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ],

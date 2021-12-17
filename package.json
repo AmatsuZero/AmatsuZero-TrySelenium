@@ -23,6 +23,18 @@
             "command": "video-previewer.parseNewList",
             "title": "解析新作品列表"
          }
+      ],
+      "configuration": [
+         {"title": "数据存储位置", "properties": {
+            "sis001-downloader.database": {
+               "type": "string",
+               "description": "存放数据库的位置"
+            },
+            "sis001-downloader.logger": {
+               "type": "string",
+               "description": "存放日志的位置"
+            }
+         }}
       ]
    },
    "scripts": {
