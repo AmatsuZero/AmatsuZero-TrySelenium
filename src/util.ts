@@ -16,12 +16,9 @@ import { createInterface } from 'readline';
 import dotenv from "dotenv";
 import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
-import { ExtensionContext, workspace } from 'vscode';
-import { promisify } from 'util';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
-const logPath = path.join(__dirname, '..', 'log.txt');
-const mkdir = promisify(fs.mkdir);
+const defaultLogPath = path.join(__dirname, '..', 'log.txt');
 
 const PageCode = {
   NEW: 'forum-561',
@@ -140,7 +137,7 @@ const parseInitArgs = async () => {
       startpage = parseInt(arg.split("=")[1], 10);
     } else if (arg.startsWith("--resume")) {
       isResume = true;
-      const value = await processLogByLine(logPath);
+      const value = await processLogByLine(defaultLogPath);
       startpage = value.startPage;
       pages = value.retryPages;
     } else if (arg.startsWith("--single")) {
@@ -149,21 +146,15 @@ const parseInitArgs = async () => {
       isUpdateTags = true;
     }
   }
-  createLogger();
+  createLogger(defaultLogPath);
   return { startpage, pages, isResume, isUpdateTags };
 };
 
-const createLogger = (ctx?: ExtensionContext) => {
+const createLogger = (log?: string) => {
   if (process.env.NODE_ENV === "TEST" || process.env.NODE_ENV === "DEBUG") {
     Logger = console;
   } else {
-    let loggerPath = logPath;
-    if (ctx !== undefined) {
-      loggerPath = workspace.getConfiguration("sis001-downloader").get("logger") as string; // 先从配置获取位置
-      if (loggerPath === undefined || loggerPath.length === 0) {
-        loggerPath = path.join(ctx.logUri.fsPath, 'log.txt');
-      }
-    }
+    const loggerPath = log !== undefined && log.length > 0 ? log : defaultLogPath;
     const ws = fs.createWriteStream(loggerPath, {
       flags:'w', // 文件的打开模式
       mode:0o666, // 文件的权限设置
@@ -225,25 +216,13 @@ const ShouldCountinue = () => {
   return !ans;
 }
 
-const prepareConnection = async (ctx?: ExtensionContext) => {
+const prepareConnection = async (databasePath?: string) => {
   Logger.log("💻 准备创建数据库链接");
-  const databaseName = 'database.sqlite';
   let database = "";
-  if (ctx !== undefined) {
-    let dir = workspace.getConfiguration("sis001-downloader").get("database") as string; // 先从配置获取位置
-    if (dir === undefined || dir.length === 0) {
-      dir = ctx.globalStorageUri.fsPath;
-    }
-    if (!fs.existsSync(dir)) {
-      dir = path.normalize(path.join(dir, '..')); // 父文件夹一定存在
-      dir = path.join(dir, 'sis001-downloadwer-data');
-      if (!fs.existsSync(dir)) {
-        await mkdir(dir);
-      }
-    }
-    database = path.join(dir, databaseName);
+  if (databasePath !== undefined && databasePath.length > 0) {
+    database = databasePath;
   } else {
-    database = path.join(__dirname, '..', 'data', databaseName);
+    database = path.join(__dirname, '..', 'data', 'database.sqlite');
   }
   const hasHistoryData = fs.existsSync(database);
   const connection = await createConnection({
