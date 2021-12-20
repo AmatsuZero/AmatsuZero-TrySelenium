@@ -1,5 +1,5 @@
 import { Logger, parseInitArgs, prepareConnection } from './util';
-import { resume, specifiedPages, parseNewListPage, updateNewTags } from './route';
+import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPage } from './route';
 import { nameExtraction } from './name_extraction';
 
 (async () => {
@@ -17,11 +17,12 @@ import { nameExtraction } from './name_extraction';
       await specifiedPages(connection, pages);
     } else {
       await parseNewListPage(connection, startpage, hasHistoryData);
-      // await parseACGListPage(connection, startpage, hasHistoryData);
+      await parseACGListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');
     Logger.error(e);
+    process.exit(-1);
   } finally {
     Logger.log(`🚀 任务结束：${new Date().toLocaleString('zh-CN')}`);
     connection.close();

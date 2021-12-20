@@ -1,6 +1,6 @@
 import path from 'path';
 import * as vscode from 'vscode';
-import { createLogger, Logger } from '../util';
+import { createLogger, Logger, processLogByLine } from '../util';
 import { Commands, parseNewList } from './route';
 
 const getLoggerPath = async (ctx: vscode.ExtensionContext) => {
@@ -12,15 +12,17 @@ const getLoggerPath = async (ctx: vscode.ExtensionContext) => {
 }
 
 const init = async (context: vscode.ExtensionContext) => {
-	createLogger(await getLoggerPath(context)); // 设置日志
+	const loggerPath = await getLoggerPath(context); // 设置日志
+	createLogger(loggerPath); 
 	const driverPath = vscode.workspace.getConfiguration("sis001-downloader").get("chromeDriverPath") as string;
 	process.env.driverPath = driverPath;
+	return processLogByLine(loggerPath);
 };
 
 const activate = async (context: vscode.ExtensionContext) => {
-	await init(context);
-	Logger.log('🎉 插件 "sis001-downloader" 现在启动了！');
-	const disposable = vscode.commands.registerCommand(Commands.ParseNewListCommand, async () => await parseNewList(context));
+	const { startPage, retryPages } = await init(context);
+	Logger.log(`🎉 插件 "sis001-downloader" 现在启动了！需要重试的有：${retryPages.join("\n")}`);
+	const disposable = vscode.commands.registerCommand(Commands.ParseNewListCommand, async () => await parseNewList(context, startPage));
 	context.subscriptions.push(disposable);
 }
 

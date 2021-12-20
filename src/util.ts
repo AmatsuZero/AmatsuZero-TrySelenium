@@ -21,6 +21,8 @@ import { ThreadInfo } from './newlist';
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
 const scriptpath = path.join(__dirname, '../scripts', 'name_extraction.py');
+// 加载环境变量
+dotenv.config();
 
 const PageCode = {
   NEW: 'forum-561',
@@ -51,12 +53,12 @@ const makeBrowser = async (driverPath?: string) => {
   const builder = new Builder().forBrowser(Browser.CHROME);
   // vscode 插件下，chromedriver 路径也需要指定了
   const location = process.env.driverPath;
-  if(os.platform() === 'linux') {// linux 需要指定 driver 位置  
+  if (os.platform() === 'linux') {
     // 额外设置
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu'");
     options.addArguments("--no-sandbox");
-  } 
+  }
   const serviceBuilder = new ServiceBuilder(location);
   builder.setChromeService(serviceBuilder);
   return await builder.setChromeOptions(options).build();
@@ -86,6 +88,7 @@ const findAvailableHost = async () => {
 let Logger: Console;
 
 process.stdin.resume();// so the program will not close instantly
+process.setMaxListeners(0); // 消除监听数达到最大导致的警告
 
 // do something when app is closing
 process.on('exit', () => {
@@ -94,22 +97,22 @@ process.on('exit', () => {
 
 // catches ctrl+c event
 process.on('SIGINT', (code) => {
-  Logger.error(`❌ 程序强制结束, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+  Logger.error(`❌ 程序强制结束, #%d：${new Date().toLocaleString('zh-CN')}`, code);
   process.exit();
 });
 
 // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', (code) => {
-  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`, code);
   process.exit();
 });
-process.on('SIGUSR2',  (code) => {
-  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`,code);
+process.on('SIGUSR2', (code) => {
+  Logger.error(`❌ 程序被杀死, #%d：${new Date().toLocaleString('zh-CN')}`, code);
   process.exit();
 });
 
 // catches uncaught exceptions
-process.on('uncaughtException',   (error, origin) => {
+process.on('uncaughtException', (error, origin) => {
   Logger.log(`❌ 程序异常终止， 来源是${origin}：${new Date().toLocaleString('zh-CN')}`);
   Logger.error(error);
   process.exit();
@@ -121,9 +124,6 @@ const getThreadId = (href: string) => {
   const id = link.split("-")[1];
   return parseInt(id, 10);
 };
-
-// 加载环境变量
-dotenv.config();
 
 const parseInitArgs = async () => {
   let startpage = 1
@@ -160,12 +160,12 @@ const createLogger = (log?: string) => {
   } else {
     const loggerPath = log !== undefined && log.length > 0 ? log : defaultLogPath;
     const ws = fs.createWriteStream(loggerPath, {
-      flags:'w', // 文件的打开模式
-      mode:0o666, // 文件的权限设置
-      encoding:'utf8', // 写入文件的字符的编码
-      highWaterMark:3, // 最高水位线
-      start:0, // 写入文件的起始索引位置        
-      autoClose:true, // 是否自动关闭文档
+      flags: 'w', // 文件的打开模式
+      mode: 0o666, // 文件的权限设置
+      encoding: 'utf8', // 写入文件的字符的编码
+      highWaterMark: 3, // 最高水位线
+      start: 0, // 写入文件的起始索引位置        
+      autoClose: true, // 是否自动关闭文档
     });
     Logger = new Console(ws, ws);
   }
@@ -184,15 +184,15 @@ const processLogByLine = async (path: string) => {
   for await (const line of rl) {
     // Each line in input.txt will be successively available here as `line`.
     if (line.startsWith("🔗 即将打开新作品")) {
-      const array = line.split("：")[0].match( /[0-9]/g);
+      const array = line.split("：")[0].match(/[0-9]/g);
       if (array !== null) {
         const page = parseInt(array.join(""), 10);
         if (page > startPage) {
           startPage = page;
         }
       }
-    } else if (line.startsWith("❌ 提取页面信息失败:") 
-    || line.startsWith("❌ 解析保存失败:")) {
+    } else if (line.startsWith("❌ 提取页面信息失败:")
+      || line.startsWith("❌ 解析保存失败:")) {
       const href = line.split(": ")[1];
       const parts = href.split("-");
       retryPages.push(new ThreadInfo(parts[0], parts.length > 1 ? parts[1] : ""));
@@ -285,5 +285,6 @@ export {
   ShouldCountinue,
   prepareConnection,
   createLogger,
-  extracName
+  extracName,
+  processLogByLine,
 }

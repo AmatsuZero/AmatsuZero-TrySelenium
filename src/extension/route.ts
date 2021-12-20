@@ -23,11 +23,11 @@ const getDBPath = async (ctx: ExtensionContext) => {
 		return database;
 }
 
-const parseNewList = async (ctx: ExtensionContext) => {
+const parseNewList = async (ctx: ExtensionContext, startPage = 1) => {
 	window.showInformationMessage('⚙️ 从插件解析新作品列表！');
 	const { connection, hasHistoryData } = await prepareConnection(await getDBPath(ctx));
 	try {
-		await parseNewListPage(connection, 1, hasHistoryData);
+		await parseNewListPage(connection, startPage, hasHistoryData);
 	} catch(e) {
     window.showErrorMessage("❌ 解析新作品列表出错");
     Logger.error(e);
