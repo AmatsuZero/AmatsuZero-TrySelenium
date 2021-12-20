@@ -42,7 +42,7 @@ const hosts = [
   "http://162.252.9.2/"
 ];
 
-const makeBrowser = async () => {
+const makeBrowser = async (driverPath?: string) => {
   const options = new Options();
   options.addArguments("--headless"); // 创建无头浏览器
   // 尝试解决超时问题：https://stackoverflow.com/questions/48450594/selenium-timed-out-receiving-message-from-renderer
@@ -50,11 +50,8 @@ const makeBrowser = async () => {
   options.addArguments("start-maximized");
   const builder = new Builder().forBrowser(Browser.CHROME);
   // vscode 插件下，chromedriver 路径也需要指定了
-  let location = '';
-  if (os.platform() === 'darwin') {
-    location = '/usr/local/bin/chromedriver'; // 通过 homebrew 安装的路径
-  } else if(os.platform() === 'linux') {// linux 需要指定 driver 位置
-    location = path.join(__dirname, "..", "env/linux", "chromedriver");
+  const location = process.env.driverPath;
+  if(os.platform() === 'linux') {// linux 需要指定 driver 位置  
     // 额外设置
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu'");
@@ -144,11 +141,13 @@ const parseInitArgs = async () => {
       startpage = value.startPage;
       pages = value.retryPages;
     } else if (arg.startsWith("--single")) {
-      pages = arg.split("")[1].split(",").map(page => new ThreadInfo(page, ""));
+      pages = arg.split("=")[1].split(",").map(page => new ThreadInfo(page, ""));
     } else if (arg.startsWith("--updateTags")) {
       isUpdateTags = true;
     } else if (arg.startsWith("--updateNames")) {
       isUpdateNames = true;
+    } else if (arg.startsWith("--chromeDriver")) {
+      process.env.driverPath = arg.split("=")[1];
     }
   }
   createLogger(defaultLogPath);

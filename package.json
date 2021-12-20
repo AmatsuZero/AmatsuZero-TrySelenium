@@ -35,6 +35,10 @@
                "sis001-downloader.logger": {
                   "type": "string",
                   "description": "存放日志的位置"
+               },
+               "sis001-downloader.chromeDriverPath": {
+                  "type": "string",
+                  "description": "chromedriver 路径"
                }
             }
          }
