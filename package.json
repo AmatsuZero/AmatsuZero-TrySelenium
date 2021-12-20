@@ -15,13 +15,18 @@
       "Other"
    ],
    "activationEvents": [
-      "onCommand:video-previewer.parseNewList"
+      "onCommand:video-previewer.parseNewList",
+      "onCommand:video-previewer.parseACGList"
    ],
    "contributes": {
       "commands": [
          {
             "command": "video-previewer.parseNewList",
             "title": "解析新作品列表"
+         },
+         {
+            "command": "video-previewer.parseACGList",
+            "title": "解析ACG作品列表"
          }
       ],
       "configuration": [

@@ -1,7 +1,7 @@
 import path from 'path';
 import * as vscode from 'vscode';
 import { createLogger, Logger, processLogByLine } from '../util';
-import { Commands, parseNewList } from './route';
+import { Commands, parseACGList, parseNewList } from './route';
 
 const getLoggerPath = async (ctx: vscode.ExtensionContext) => {
 	let loggerPath = vscode.workspace.getConfiguration("sis001-downloader").get("logger") as string; // 先从配置获取位置
@@ -22,8 +22,10 @@ const init = async (context: vscode.ExtensionContext) => {
 const activate = async (context: vscode.ExtensionContext) => {
 	const { startPage, retryPages } = await init(context);
 	Logger.log(`🎉 插件 "sis001-downloader" 现在启动了！需要重试的有：${retryPages.join("\n")}`);
-	const disposable = vscode.commands.registerCommand(Commands.ParseNewListCommand, async () => await parseNewList(context, startPage));
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(vscode.commands.registerCommand(Commands.ParseNewListCommand, 
+		async () => await parseNewList(context, startPage)));
+	context.subscriptions.push(vscode.commands.registerCommand(Commands.ParseACGListCommand, 
+		async () => await parseACGList(context, startPage)));
 }
 
 const deactivate = () => {};

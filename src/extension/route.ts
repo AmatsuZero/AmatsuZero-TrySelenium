@@ -3,7 +3,7 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { ExtensionContext, workspace, window } from 'vscode';
 import { Logger, prepareConnection } from '../util';
-import { parseNewListPage } from '../route';
+import { parseNewListPage, parseACGListPage } from '../route';
 
 const mkdir = promisify(fs.mkdir);
 
@@ -36,11 +36,26 @@ const parseNewList = async (ctx: ExtensionContext, startPage = 1) => {
 	}
 };
 
+const parseACGList = async (ctx: ExtensionContext, startPage = 1) => {
+  window.showInformationMessage('⚙️ 从插件解析 ACG 列表！');
+  const { connection, hasHistoryData } = await prepareConnection(await getDBPath(ctx));
+  try {
+    await parseACGListPage(connection, startPage, hasHistoryData);
+	} catch(e) {
+    window.showErrorMessage("❌ 解析新作品列表出错");
+    Logger.error(e);
+	} finally {
+		await connection.close();
+	}
+};
+
 const Commands = {
-  ParseNewListCommand: 'video-previewer.parseNewList'
+  ParseNewListCommand: 'video-previewer.parseNewList',
+  ParseACGListCommand: 'video-previewer.parseACGList',
 };
 
 export {
   parseNewList,
+  parseACGList,
   Commands
 }
