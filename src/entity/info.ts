@@ -1,5 +1,6 @@
 import { By, WebElement } from "selenium-webdriver";
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { extracName } from "../util";
 
 const ContentType = {
   COLLECtiON: '合集',

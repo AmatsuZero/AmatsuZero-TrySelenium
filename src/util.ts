@@ -10,6 +10,7 @@ import { URL } from 'url';
 import path from 'path';
 import fs from "fs";
 import os from 'os';
+import { spawn } from 'child_process';
 import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
@@ -19,6 +20,7 @@ import { ThreadInfo } from './newlist';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
+const scriptpath = path.join(__dirname, '../scripts', 'name_extraction.py');
 
 const PageCode = {
   NEW: 'forum-561',
@@ -131,6 +133,7 @@ const parseInitArgs = async () => {
   let pages: ThreadInfo[] = [];
   let isResume = false;
   let isUpdateTags = false;
+  let isUpdateNames = false;
   // 检查起始页码
   for (const arg of process.argv) {
     if (arg.startsWith("--page")) {
@@ -144,10 +147,12 @@ const parseInitArgs = async () => {
       pages = arg.split("")[1].split(",").map(page => new ThreadInfo(page, ""));
     } else if (arg.startsWith("--updateTags")) {
       isUpdateTags = true;
+    } else if (arg.startsWith("--updateNames")) {
+      isUpdateNames = true;
     }
   }
   createLogger(defaultLogPath);
-  return { startpage, pages, isResume, isUpdateTags };
+  return { startpage, pages, isResume, isUpdateTags, isUpdateNames };
 };
 
 const createLogger = (log?: string) => {
@@ -248,6 +253,28 @@ const prepareConnection = async (databasePath?: string) => {
   return { connection, hasHistoryData };
 };
 
+const extracName = (title: string) => new Promise<string[]>((resolve, reject) => {
+  const pythonProcess = spawn('python3', [scriptpath, title]);
+  pythonProcess.stdout.on("data", data => {
+    const input: string = data.toString();
+    const names = input.split(',')
+      .map(n => n.replace('[', ""))
+      .map(n => n.replace(']', ""))
+      .map(n => n.trim())
+      .map(n => n.replace(/'/g, ""));
+    resolve(names); // <------------ by default converts to utf-8
+    if (!pythonProcess.kill()) {
+      console.log(`${pythonProcess} kill failed`);
+    }
+  });
+  process.stderr.on("data", data => {
+    reject(data);
+    if (!pythonProcess.kill()) {
+      console.log(`${pythonProcess} kill failed`);
+    }
+  });
+});
+
 export {
   makeBrowser,
   findAvailableHost,
@@ -258,5 +285,6 @@ export {
   parseInitArgs,
   ShouldCountinue,
   prepareConnection,
-  createLogger
+  createLogger,
+  extracName
 }

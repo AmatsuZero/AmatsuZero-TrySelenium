@@ -1,13 +1,16 @@
 import { Logger, parseInitArgs, prepareConnection } from './util';
 import { resume, specifiedPages, parseNewListPage, updateNewTags } from './route';
+import { nameExtraction } from './name_extraction';
 
 (async () => {
-  const { startpage, pages, isResume, isUpdateTags } = await parseInitArgs();
+  const { startpage, pages, isResume, isUpdateTags, isUpdateNames } = await parseInitArgs();
   Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
   const { connection, hasHistoryData } = await prepareConnection();
   try {
     if (isUpdateTags) {
       await updateNewTags(connection);
+    } else if (isUpdateNames) {
+      await nameExtraction();
     } else if (isResume) {
       await resume(connection, startpage, pages);
     } else if (pages.length > 0) {
