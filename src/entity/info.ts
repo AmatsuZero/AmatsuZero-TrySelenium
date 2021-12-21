@@ -68,7 +68,7 @@ class InfoModel {
         this.title = str.split(separator)[1];
       } else if (str.includes("影片格式")) {
         this.format = str.split(separator)[1];
-      } else if (str.includes("影片大小")) {
+      } else if (str.includes("影片大小")|| str.includes("视频大小")) {
         this.size = str.split(separator)[1];
       } else if (str.includes("影片時間")) {
         this.size = str.split(separator)[1];
@@ -132,6 +132,7 @@ class InfoModel {
       this.buildCartoonInfo(lines);
       break;
     default:
+      this.tag = "杂";
       this.buildMiscInfo();
       break;
     }
@@ -155,7 +156,7 @@ class InfoModel {
         this.title = str.split(separator)[1];
       } else if (str.includes("影片格式")) {
         this.format = str.split(separator)[1];
-      } else if (str.includes("影片大小")) {
+      } else if (str.includes("影片大小")|| str.includes("视频大小")) {
         this.size = str.split(separator)[1];
       } else if (str.includes("影片時間")) {
         this.size = str.split(separator)[1];
@@ -219,7 +220,7 @@ class InfoModel {
   }
 
   protected async buildMiscInfo() {
-    console.log("");
+    await this.build();
   }
 
   protected blurVerification(str: string) {

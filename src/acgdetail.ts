@@ -1,7 +1,7 @@
 import { By, WebDriver } from "selenium-webdriver";
 import DetailPage from "./detail";
 import { InfoModel } from "./entity/info";
-import { makeBrowser } from "./util";
+import { Logger, makeBrowser } from "./util";
 
 export default class ACGDetailPage extends DetailPage {
   public async extractInfo() {
@@ -14,7 +14,9 @@ export default class ACGDetailPage extends DetailPage {
       detail.category = this.category();
       await detail.buildACG();
       if (detail.title === undefined || detail.title.length === 0) { // 存在 title 没提取出来的情况，补救一下
-        detail.title = await this.extractTitle(driver, detail.postId);
+        detail.title = await driver.getTitle();
+        detail.title = detail.title.split("-")[0];
+        detail.title = detail.title.trim();
       }
       await this.findTorrentLink(detail, driver); // 提取种子链接
       return detail;
@@ -23,8 +25,7 @@ export default class ACGDetailPage extends DetailPage {
     }
   }
 
-  protected async extractTitle(driver: WebDriver, postId: string) {
-    const h2Elemnt = driver.findElement(By.xpath(`//*[@id="pid${postId}"]/tbody/tr[1]/td[2]/div[4]/h2`));
-    return h2Elemnt.getText();
+  protected category() {
+      return "acg";
   }
 }
