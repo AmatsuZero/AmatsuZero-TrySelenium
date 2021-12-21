@@ -195,7 +195,8 @@ const processLogByLine = async (path: string) => {
       || line.startsWith("❌ 解析保存失败:")) {
       const href = line.split(": ")[1];
       const parts = href.split("-");
-      retryPages.push(new ThreadInfo(parts[0], parts.length > 1 ? parts[1] : ""));
+      const tag = parts.shift();
+      retryPages.push(new ThreadInfo(parts.join("-"), tag !== undefined ? tag : ""));
     } else if (line.startsWith("🔧 从上次日志恢复：")) {
       const num = line.split("：")[1];
       const page = parseInt(num, 10);

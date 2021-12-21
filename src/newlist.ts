@@ -12,6 +12,10 @@ class ThreadInfo {
     this.href = href;
     this.tag = tag;
   }
+
+  public toString() {
+    return `【标签】${this.tag} 【链接】${this.href}`;
+  }
 }
 
 const extractLinks = async (elms: WebElement[]) => {

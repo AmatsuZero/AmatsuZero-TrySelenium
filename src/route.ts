@@ -129,7 +129,7 @@ const resume = async (connection: Connection, start: number, pages: ThreadInfo[]
     Logger.log("🔧 从上次日志恢复");
   }
   if (pages.length > 0) {
-    Logger.log(`🔧 要重新尝试下载的作品有：${pages.join("\n")}`);
+    Logger.log(`🔧 要重新尝试下载的作品有：\n${pages.join("\n")}`);
   }
   await specifiedPages(connection, pages);
   await parseNewListPage(connection, start, true);

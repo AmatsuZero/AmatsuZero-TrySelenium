@@ -21,7 +21,7 @@ const init = async (context: vscode.ExtensionContext) => {
 
 const activate = async (context: vscode.ExtensionContext) => {
 	const { startPage, retryPages } = await init(context);
-	Logger.log(`🎉 插件 "sis001-downloader" 现在启动了！需要重试的有：${retryPages.join("\n")}`);
+	Logger.log(`🎉 插件 "sis001-downloader" 现在启动了！需要重试的有：\n${retryPages.join("\n")}`);
 	context.subscriptions.push(vscode.commands.registerCommand(Commands.ParseNewListCommand, 
 		async () => await parseNewList(context, startPage)));
 	context.subscriptions.push(vscode.commands.registerCommand(Commands.ParseACGListCommand, 
