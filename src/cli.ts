@@ -10,7 +10,7 @@ import { nameExtraction } from './name_extraction';
     if (isUpdateTags) {
       await updateNewTags(connection);
     } else if (isUpdateNames) {
-      await nameExtraction();
+      await nameExtraction(connection);
     } else if (isResume) {
       await resume(connection, startpage, pages);
     } else if (pages.length > 0) {

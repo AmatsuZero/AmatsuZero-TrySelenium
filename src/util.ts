@@ -10,7 +10,6 @@ import { URL } from 'url';
 import path from 'path';
 import fs from "fs";
 import os from 'os';
-import { spawn } from 'child_process';
 import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
@@ -20,7 +19,7 @@ import { ThreadInfo } from './newlist';
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
-const scriptpath = path.join(__dirname, '../scripts', 'name_extraction.py');
+
 // 加载环境变量
 dotenv.config();
 
@@ -253,28 +252,6 @@ const prepareConnection = async (databasePath?: string) => {
   return { connection, hasHistoryData };
 };
 
-const extracName = (title: string) => new Promise<string[]>((resolve, reject) => {
-  const pythonProcess = spawn('python3', [scriptpath, title]);
-  pythonProcess.stdout.on("data", data => {
-    const input: string = data.toString();
-    const names = input.split(',')
-      .map(n => n.replace('[', ""))
-      .map(n => n.replace(']', ""))
-      .map(n => n.trim())
-      .map(n => n.replace(/'/g, ""));
-    resolve(names); // <------------ by default converts to utf-8
-    if (!pythonProcess.kill()) {
-      console.log(`${pythonProcess} kill failed`);
-    }
-  });
-  process.stderr.on("data", data => {
-    reject(data);
-    if (!pythonProcess.kill()) {
-      console.log(`${pythonProcess} kill failed`);
-    }
-  });
-});
-
 export {
   makeBrowser,
   findAvailableHost,
@@ -286,6 +263,5 @@ export {
   ShouldCountinue,
   prepareConnection,
   createLogger,
-  extracName,
   processLogByLine,
 }
