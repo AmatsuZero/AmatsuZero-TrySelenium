@@ -1,6 +1,7 @@
 import {
   Browser,
   Builder,
+  WebDriver,
 } from 'selenium-webdriver';
 import {
   ServiceBuilder,
@@ -43,7 +44,7 @@ const hosts = [
   "http://162.252.9.2/"
 ];
 
-const makeBrowser = async (driverPath?: string) => {
+const makeBrowser = async () => {
   const options = new Options();
   options.addArguments("--headless"); // 创建无头浏览器
   // 尝试解决超时问题：https://stackoverflow.com/questions/48450594/selenium-timed-out-receiving-message-from-renderer
@@ -57,7 +58,11 @@ const makeBrowser = async (driverPath?: string) => {
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu'");
     options.addArguments("--no-sandbox");
+    options.addArguments("--disable-browser-side-navigation"); // https://stackoverflow.com/a/49123152/1689770
+    options.addArguments("--disable-infobars"); // https://stackoverflow.com/a/43840128/1689770
+    options.addArguments("--disable-dev-shm-usage"); // https://stackoverflow.com/a/50725918/1689770
   }
+  options.addArguments("–enable-low-end-device-mode"); // 开启低性能模式
   const serviceBuilder = new ServiceBuilder(location);
   builder.setChromeService(serviceBuilder);
   return await builder.setChromeOptions(options).build();
@@ -65,9 +70,10 @@ const makeBrowser = async (driverPath?: string) => {
 
 const findAvailableHost = async () => {
   let expectedHost = '';
-  for (const host of hosts) {
-    const driver = await makeBrowser();
-    try {
+  let driver: WebDriver | null | undefined;
+  try {
+    driver = await makeBrowser();
+    for (const host of hosts) {
       const bbs = new URL(SISPaths.INDEX, host)
       await driver.get(bbs.href);
       const title = await driver.getTitle();
@@ -75,9 +81,11 @@ const findAvailableHost = async () => {
         expectedHost = host;
         break;
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
+    }
+  } catch(e) {
+    Logger.error(e);
+  } finally {
+    if (driver !== null && driver !== undefined) {
       await driver.quit();
     }
   }

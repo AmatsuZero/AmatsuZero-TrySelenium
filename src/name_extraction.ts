@@ -45,3 +45,28 @@ export async function nameExtraction(connection: Connection) {
   connection.close();
   process.exit(0);
 }
+
+export async function repair(connection: Connection) {
+  const repo = connection.getRepository(InfoModel);
+  const info = await repo.find(); 
+  for (const e of info) {
+    if (e.torrentLink.length === 0) {
+      await repo.remove(e);
+      console.log(`即将删除： ${e.threadId} ${e.title}`);
+      continue;
+    } else if (e.actors.length > 0) {
+      let actors:string[] = [];
+      for (const actor of e.actors) {
+        actors = actors.concat(actor.split(" "));
+      }
+      e.actors = actors.filter(name => name !== "等");
+    }
+    e.thumbnails = e.thumbnails.filter(link => {
+      const ext = path.extname(link);
+      return ext !== '.gif';
+    })
+    await repo.save(e);
+  }
+  connection.close();
+  process.exit(0);
+}

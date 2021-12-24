@@ -1,3 +1,4 @@
+import { extname } from 'path';
 import { By, WebElement } from "selenium-webdriver";
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -77,14 +78,16 @@ class InfoModel {
         this.sig = str.split(separator)[1];
       } else if (str.includes("出演女優")) {
         const value = str.split(separator)[1];
-        this.actors = value.length > 0 ? value.split(",") : [];
+        const actors = value.length > 0 ? value.split(" ") : [];
+        this.actors = actors.filter(name => name !== "等");
       }
     });
     // 提取预览图链接
     const pics = await this.sourceElment.findElements(By.xpath(`//*[@id="postmessage_${this.postId}"]//img`));
     for (const pic of pics) {
       const link = await pic.getAttribute("src");
-      if (link.length > 0) {
+      const extName = extname(link); // gif 图片是宣传图片，需要过滤掉
+      if (link.length > 0 && extName !== '.gif') {
         this.thumbnails.push(link);
       }
     }

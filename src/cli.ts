@@ -1,12 +1,15 @@
 import { Logger, parseInitArgs, prepareConnection } from './util';
 import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPage } from './route';
 import { nameExtraction } from './name_extraction';
+import { Connection } from 'typeorm';
 
 (async () => {
-  const { startpage, pages, isResume, isUpdateTags, isUpdateNames } = await parseInitArgs();
-  Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
-  const { connection, hasHistoryData } = await prepareConnection();
+  let conn: Connection | null | undefined
   try {
+    const { startpage, pages, isResume, isUpdateTags, isUpdateNames } = await parseInitArgs();
+    Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
+    const { connection, hasHistoryData } = await prepareConnection();
+    conn = connection;
     if (isUpdateTags) {
       await updateNewTags(connection);
     } else if (isUpdateNames) {
@@ -25,7 +28,9 @@ import { nameExtraction } from './name_extraction';
     process.exit(-1);
   } finally {
     Logger.log(`🚀 任务结束：${new Date().toLocaleString('zh-CN')}`);
-    connection.close();
+    if (conn !== null && conn !== undefined) {
+      await conn.close()
+    }
   }
 })();
 

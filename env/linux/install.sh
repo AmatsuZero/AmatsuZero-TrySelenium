@@ -1,5 +1,3 @@
-pushd ./env/linux
-
 echo “即将下载 Chrome”
 
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
@@ -21,5 +19,3 @@ rm chromedriver_linux64.zip
 rm google-chrome-stable_current_x86_64.rpm
 
 echo "依赖准备完毕"
-
-popd
