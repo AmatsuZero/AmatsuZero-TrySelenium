@@ -4,7 +4,7 @@ import { nameExtraction } from './name_extraction';
 import { Connection } from 'typeorm';
 
 (async () => {
-  let conn: Connection | null | undefined
+  let conn: Connection | null | undefined;
   try {
     const { startpage, pages, isResume, isUpdateTags, isUpdateNames } = await parseInitArgs();
     Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);

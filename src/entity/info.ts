@@ -93,8 +93,30 @@ class InfoModel {
     }
   }
 
-  public notionProperties() {
-    
+  public buildNotionProperties(pageId: string) {
+    return {
+      properties: {
+        title: [
+          {
+            "text": {
+              "content": this.title
+            },
+          },
+        ],
+      },
+      children: [
+        {
+          object: 'block',
+          type: 'image',
+          image: {
+            type: 'external',
+            external: {
+              url: this.thumbnails[0]
+            }
+          }
+        }
+      ]
+    }
   }
 
   public toString() {
@@ -111,7 +133,14 @@ class InfoModel {
       ---- post id: ${this.postId} ----
       `;
     } else {
-      return ``;
+      return `---- thread id: ${this.threadId} ---- 
+      【类型】${this.tag}
+      【名稱】：${this.title}
+      【大小】：${this.size}
+      【預覽】：图片较大请等待，看不到图请使用代理。
+      ${this.thumbnails.join("\n")}
+      ---- post id: ${this.postId} ----
+      `;
     }
   }
 

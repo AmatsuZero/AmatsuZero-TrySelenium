@@ -76,7 +76,6 @@
    },
    "homepage": "https://github.com/AmatsuZero/TrySelenium#readme",
    "dependencies": {
-      "@notionhq/client": "^0.4.4",
       "dotenv": "^10.0.0",
       "reflect-metadata": "^0.1.10",
       "selenium-webdriver": "^4.1.0",
