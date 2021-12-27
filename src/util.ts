@@ -41,7 +41,11 @@ const hosts = [
   "http://162.252.9.11/",
   "http://154.84.5.249/",
   "http://154.84.5.211/",
-  "http://162.252.9.2/"
+  "http://162.252.9.2/",
+  "http://68.168.16.150/",
+  "http://68.168.16.151/",
+  "http://68.168.16.153/",
+  "http://68.168.16.154/"
 ];
 
 const makeBrowser = async () => {
@@ -138,6 +142,7 @@ const parseInitArgs = async () => {
   let isResume = false;
   let isUpdateTags = false;
   let isUpdateNames = false;
+  let isHexo = false;
   // 检查起始页码
   for (const arg of process.argv) {
     if (arg.startsWith("--page")) {
@@ -155,10 +160,12 @@ const parseInitArgs = async () => {
       isUpdateNames = true;
     } else if (arg.startsWith("--chromeDriver")) {
       process.env.driverPath = arg.split("=")[1];
+    } else if (arg.startsWith("--hexo")) {
+      isHexo = true;
     }
   }
   createLogger(defaultLogPath);
-  return { startpage, pages, isResume, isUpdateTags, isUpdateNames };
+  return { startpage, pages, isResume, isUpdateTags, isUpdateNames, isHexo };
 };
 
 const createLogger = (log?: string) => {

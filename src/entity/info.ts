@@ -93,32 +93,6 @@ class InfoModel {
     }
   }
 
-  public buildNotionProperties(pageId: string) {
-    return {
-      properties: {
-        title: [
-          {
-            "text": {
-              "content": this.title
-            },
-          },
-        ],
-      },
-      children: [
-        {
-          object: 'block',
-          type: 'image',
-          image: {
-            type: 'external',
-            external: {
-              url: this.thumbnails[0]
-            }
-          }
-        }
-      ]
-    }
-  }
-
   public toString() {
     if (this.category === 'new') {
       return `---- thread id: ${this.threadId} ---- 

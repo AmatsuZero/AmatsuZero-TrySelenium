@@ -109,3 +109,4 @@ data/
 env/linux/chromedriver
 log.txt
 .env
+hexo/

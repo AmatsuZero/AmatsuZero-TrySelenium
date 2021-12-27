@@ -58,7 +58,8 @@
       "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
       "lint": "eslint --fix src --ext .ts",
       "cli": "yarn build && node --trace-warnings dist/cli.js",
-      "migration": "typeorm migration:run"
+      "migration": "typeorm migration:run",
+      "hexo-init": "hexo init hexo"
    },
    "husky": {
       "hooks": {
@@ -76,7 +77,9 @@
    },
    "homepage": "https://github.com/AmatsuZero/TrySelenium#readme",
    "dependencies": {
+      "axios": "^0.24.0",
       "dotenv": "^10.0.0",
+      "hexo": "^6.0.0",
       "reflect-metadata": "^0.1.10",
       "selenium-webdriver": "^4.1.0",
       "sqlite3": "^5.0.2",
@@ -87,6 +90,7 @@
       "@babel/eslint-parser": "^7.16.3",
       "@babel/preset-env": "^7.16.4",
       "@babel/preset-typescript": "^7.16.0",
+      "@types/hexo": "^3.8.7",
       "@types/jest": "^27.0.3",
       "@types/node": "^16.11.11",
       "@types/selenium-webdriver": "^4.0.16",

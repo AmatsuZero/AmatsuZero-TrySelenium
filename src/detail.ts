@@ -1,3 +1,4 @@
+import { URL } from 'url';
 import { By, WebDriver } from "selenium-webdriver";
 import { InfoModel } from "./entity/info";
 import { makeBrowser, Logger, getThreadId, ShouldCountinue } from "./util";
