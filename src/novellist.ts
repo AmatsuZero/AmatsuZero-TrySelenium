@@ -12,8 +12,10 @@ export class NovelDetail extends DetailPage {
       await driver.get(this.href);
       const tMsg = driver.findElement(By.className("t_msgfont"));
       const model = new InfoModel(tMsg, this.threadId());
-      await model.buildNovel();
       model.category = this.category();
+      model.tag = this.tag;
+      model.format = 'txt';
+      await model.buildNovel();
       return model;
     } catch (e) {
       Logger.log(`❌ 提取小说出错：${this.href}`);
@@ -71,12 +73,15 @@ export class NovelList extends NewListPage {
       const link = elm.findElement(By.xpath(`//*[@id="thread_${id}"]/a`));
       const info = new ThreadInfo('', '');
       info.href = await link.getAttribute('href');
-      // try {
-      //   const link = await elm.findElement(By.xpath(`//tbody[@id="${stickerId}"]/tr/th/em/a`));
-      //   info.tag = await link.getText();
-      // } catch (e) {
-      //   Logger.log(e);
-      // }
+      try {
+        const link = await elm.findElement(By.xpath(`//tbody[@id="${stickerId}"]/tr/th/em/a`));
+        info.tag = await link.getText();
+        if (info.tag === '版务') {
+          continue;
+        }
+      } catch (e) {
+        continue;
+      }
       hrefs.push(info);
     }
     return hrefs;
