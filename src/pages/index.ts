@@ -1,7 +1,6 @@
 import Hexo from 'hexo';
 import path from 'path';
 import axios from 'axios';
-import { URL } from 'url';
 import { existsSync, createWriteStream, promises } from 'fs';
 import { Connection } from 'typeorm';
 import { InfoModel } from '../entity/info';
@@ -16,6 +15,7 @@ const hexo = new Hexo(hexoDir, {
 });
 
 const writeContent = async (model: InfoModel, assetDir: string) => {
+  let size = 0;
   let content = `---
 title: ${model.title}
 tags:`;
@@ -36,12 +36,24 @@ tags:`;
 【种子文件】：[种子文件](${model.postId}.torrent)
 【影片預覽】：\n`
   let pics = await promises.readdir(assetDir);
+  for (const asset of pics) {
+    const stat = await promises.stat(path.join(assetDir, asset));
+    size += stat.size;
+  }
   pics = pics.filter(pic => path.extname(pic) !== '.torrent');
-  pics.forEach(pic => {
-    content += `{% asset_img ${pic} This is an image %}\n`
+  pics.forEach((pic, idx) => {
+    if (idx === 0) {
+      content += `{% asset_img ${pic} This is an image %}\n`
+      content += '<escape><!-- more --></escape>\n';
+    } else {
+      content += `![${model.thumbnails[idx]}](${pic})`;
+    }
   });
-  const dest = path.join(postDir, `${model.threadId}.md`)
+  const dest = path.join(postDir, `${model.threadId}.md`);
   await promises.writeFile(dest, content);
+  const stat = await promises.stat(dest);
+  size += stat.size;
+  return size;
 }
 
 const download = (url: string, dest: string) =>
@@ -84,12 +96,20 @@ export async function createPosts(connection:Connection) {
     const entities = await repo.find();
     const ids = new Set(postsList);
     await hexo.init();
+    let triggerSize = 0;
     for (const entity of entities) {
       if (ids.has(`${entity.threadId}`)) {
         continue;
       }
       const assetDir = await downloadAssets(entity);
-      await writeContent(entity, assetDir);
+      triggerSize += await writeContent(entity, assetDir);
+      Logger.log(`帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
+      if (triggerSize * 0.000001 >= 90) { // Github 单次提交上限是 100MB，这里略小于上限触发
+        await hexo.call('clean');
+        await hexo.call('deploy', {_ :["-g"]});
+        Logger.log(`生成接近 100MB，部署完成🍺`);
+        triggerSize = 0;
+      }
     }
   } catch (e) {
     Logger.error(e);
