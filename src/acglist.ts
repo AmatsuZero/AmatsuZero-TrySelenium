@@ -15,4 +15,8 @@ export default class ACGList extends NewListPage {
   protected title() {
     return "ACG";
   }
+
+  protected category() {
+    return "acg";
+  }
 }

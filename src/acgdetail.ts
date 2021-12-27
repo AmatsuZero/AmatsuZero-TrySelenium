@@ -1,7 +1,7 @@
-import { By, WebDriver } from "selenium-webdriver";
+import { By } from "selenium-webdriver";
 import DetailPage from "./detail";
 import { InfoModel } from "./entity/info";
-import { Logger, makeBrowser } from "./util";
+import { makeBrowser } from "./util";
 
 export default class ACGDetailPage extends DetailPage {
   public async extractInfo() {

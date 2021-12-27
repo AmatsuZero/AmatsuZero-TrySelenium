@@ -8,7 +8,7 @@ class ThreadInfo {
   public href: string;
   public tag: string;
 
-  public constructor(href:string, tag: string) {
+  public constructor(href: string, tag: string) {
     this.href = href;
     this.tag = tag;
   }
@@ -16,26 +16,6 @@ class ThreadInfo {
   public toString() {
     return `【标签】${this.tag} 【链接】${this.href}`;
   }
-}
-
-const extractLinks = async (elms: WebElement[]) => {
-  const hrefs: ThreadInfo[] = [];
-  for (const elm of elms) {
-    const id = await elm.getAttribute("id");
-    if (id.startsWith("normalthread_")) {
-      const threadId = id.split("_")[1];
-      const link = elm.findElement(By.xpath(`//*[@id="thread_${threadId}"]/a`));
-      const href = await link.getAttribute("href");
-      let tag = '';
-      try {
-        const tagElm = await elm.findElement(By.xpath(`//*[@id="normalthread_${threadId}"]/tr/th/em/a`));
-        tag = await tagElm.getText();
-      } catch {}
-      hrefs.push(new ThreadInfo(href, tag));
-    }
-  }
- 
-  return hrefs;
 }
 
 class NewListPage {
@@ -53,7 +33,7 @@ class NewListPage {
     this.earliestid = earliestid;
   }
 
-  public async getAllThreadLinks(block: (hrefs: {href: string, tag: string }[]) => Promise<void>) {
+  public async getAllThreadLinks(block: (hrefs: { href: string, tag: string }[]) => Promise<void>) {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
@@ -117,7 +97,31 @@ class NewListPage {
     if (needClose) {
       this.destroy();
     }
-    return extractLinks(elms);
+    return this.extractLinks(elms);
+  }
+
+  protected category() {
+    return "new";
+  }
+
+  protected async extractLinks(elms: WebElement[]) {
+    const hrefs: ThreadInfo[] = [];
+    for (const elm of elms) {
+      const id = await elm.getAttribute("id");
+      if (id.startsWith("normalthread_")) {
+        const threadId = id.split("_")[1];
+        const link = elm.findElement(By.xpath(`//*[@id="thread_${threadId}"]/a`));
+        const href = await link.getAttribute("href");
+        let tag = '';
+        try {
+          const tagElm = await elm.findElement(By.xpath(`//*[@id="normalthread_${threadId}"]/tr/th/em/a`));
+          tag = await tagElm.getText();
+        } catch { }
+        hrefs.push(new ThreadInfo(href, tag));
+      }
+    }
+
+    return hrefs;
   }
 
   protected async findOutElements() {
@@ -174,8 +178,12 @@ class NewListPage {
   }
 
   protected threadsFilter(link: string) {
+    if (this.dbRepo === undefined) {
+      return true;
+    }
     const id = getThreadId(link);
-    const needParse = id > this.latestId || id < this.earliestid;
+    const model = this.dbRepo.findOne({ threadId: id, category: this.category() });
+    const needParse = model === undefined;
     if (!needParse) {
       Logger.log(`✈️ 跳过链接：${link}`);
     }
@@ -201,5 +209,5 @@ class NewListPage {
 
 export {
   NewListPage,
-  ThreadInfo
+  ThreadInfo,
 }

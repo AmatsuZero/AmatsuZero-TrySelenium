@@ -5,6 +5,7 @@ import { InfoModel } from "./entity/info";
 import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
 import ACGDetailPage from './acgdetail';
+import { NovelDetail, NovelList } from './novellist';
 
 const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
@@ -29,6 +30,25 @@ const parseACGListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]
   for (const href of hrefs) {
     Logger.log(`🔍 即将解析ACG详情页面：${href.href}`);
     const detail = new ACGDetailPage(href.href, href.tag);
+    try {
+      const info = await detail.extractInfo();
+      if (info === undefined) {
+        continue;
+      }
+      await repo.save(info);
+      Logger.log(`🍺 解析完成: ${href.tag}-${info.title}`);
+    } catch (e) {
+      ShouldCountinue();
+      Logger.error(`❌ 解析保存失败: ${href.tag}-${href.href}`);
+      Logger.error(e);
+    }
+  }
+};
+
+const parseNoveListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
+  for (const href of hrefs) {
+    Logger.log(`🔍 即将解析小说详情页面：${href.href}`);
+    const detail = new NovelDetail(href.href, href.tag);
     try {
       const info = await detail.extractInfo();
       if (info === undefined) {
@@ -106,6 +126,16 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
   Logger.log('✨ 解析 ACG 列表结束');
 };
 
+const parseNoveListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
+  const { host, latestId, earliestId } = await beforeParse(connection, "novel", hasHistoryData);
+  Logger.log('✨ 开始解析小说列表');
+  const acgList = new NovelList(host, latestId, earliestId);
+  const repo = connection.getRepository(InfoModel);
+  acgList.currentPage = startPage;
+  await acgList.getAllThreadLinks(async (hrefs) => parseNoveListData(repo, hrefs));
+  Logger.log('✨ 解析小说列表结束');
+};
+
 const updateNewTags = async (connection: Connection) => {
   const { host, latestId, earliestId } = await beforeParse(connection, "new", true);
   const newListPage = new NewListPage(host, latestId, earliestId);
@@ -139,6 +169,7 @@ export {
   parseNewlistData,
   parseNewListPage,
   parseACGListPage,
+  parseNoveListPage,
   updateNewTags,
   specifiedPages,
   resume,

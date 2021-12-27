@@ -79,7 +79,8 @@ class InfoModel {
       } else if (str.includes("出演女優")) {
         const value = str.split(separator)[1];
         const actors = value.length > 0 ? value.split(" ") : [];
-        this.actors = actors.filter(name => name !== "等");
+        this.actors = actors.filter(name => name !== "等" 
+        && name.replace(/[^\p{L}\p{N}\p{Z}]/gu, '').length > 0); // 过滤掉标点符号
       }
     });
     // 提取预览图链接
@@ -91,6 +92,13 @@ class InfoModel {
         this.thumbnails.push(link);
       }
     }
+  }
+
+  public async buildNovel() {
+    const id = await this.sourceElment.getAttribute("id");
+    this.postId = id.split("_")[1];
+    const div = await this.sourceElment.findElement(By.className('t_msgfont noSelect'));
+    this.sig = await div.getText();
   }
 
   public toString() {
@@ -106,6 +114,12 @@ class InfoModel {
       ${this.thumbnails.join("\n")}
       ---- post id: ${this.postId} ----
       `;
+    } else if (this.category === 'novel') {
+      return `---- thread id: ${this.threadId} ----
+      【小说名称】：${this.title}
+      【小说类型】：${this.tag}
+      ---- post id: ${this.postId} ----
+      `
     } else {
       return `---- thread id: ${this.threadId} ---- 
       【类型】${this.tag}

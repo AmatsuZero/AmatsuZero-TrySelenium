@@ -5,6 +5,7 @@ import { existsSync, createWriteStream, promises } from 'fs';
 import { Connection } from 'typeorm';
 import { InfoModel } from '../entity/info';
 import { Logger } from '../util';
+import { title } from 'process';
 
 const hexoDir = path.join(__dirname, '../..', 'hexo');
 const postDir = path.join(hexoDir, 'source/_posts');
@@ -13,6 +14,26 @@ const hexo = new Hexo(hexoDir, {
   debug: process.env.NODE_ENV === 'DEBUG',
   config: path.join(hexoDir, '_config.yml')
 });
+
+const handleChineseTags = (title: string) => {
+  if (title.includes("麻豆")) {
+    return "麻豆传媒";
+  } else if (title.includes("星空传媒")) {
+    return "星空传媒";
+  } else if (title.includes("果冻")) {
+    return "果冻传媒";
+  } else if (title.includes("天美")) {
+    return "天美传媒";
+  } else if (title.includes("蜜桃")) {
+    return "蜜桃传媒";
+  } else if (title.includes("乐播")) {
+    return "乐播传媒";
+  } else if (title.includes("涩污")) {
+    return "涩污传媒";
+  } else {
+    return "";
+  }
+};
 
 const writeContent = async (model: InfoModel, assetDir: string) => {
   let size = 0;
@@ -23,8 +44,15 @@ tags:`;
 - ${model.tag}
 `;
   model.actors.forEach(actor => {
-    content += `- ${actor}\n`;
+    const str = actor.replace(/[^\p{L}\p{N}\p{Z}]/gu, ''); // 去除标点符号
+    if (str.length > 0) {
+      content += `- ${actor}\n`;
+    }
   });
+  const chineseTag = handleChineseTags(model.title);
+  if (chineseTag.length > 0) {
+    content += `- ${chineseTag}\n`;
+  }
   content += `categories: ${model.category}\n`;
   content += '---\n';
   content += `【影片名稱】：${model.title}
@@ -106,13 +134,13 @@ const downloadAssets = async (model: InfoModel) => {
   return assetsDir;
 }
 
-export async function createPosts(connection:Connection) {
+export async function createNewListPosts(connection:Connection) {
   const repo = connection.getRepository(InfoModel);
   try {
     let postsList = await promises.readdir(postDir);
     postsList = postsList.filter(post => path.extname(post) === '.md');
     postsList = postsList.map(filename => filename.split('.').slice(0, -1).join('.'));
-    const entities = await repo.find();
+    const entities = await repo.find({category: "new"});
     const ids = new Set(postsList);
     await hexo.init();
     let triggerSize = 0;
