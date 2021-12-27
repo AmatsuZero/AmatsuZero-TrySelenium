@@ -1,6 +1,6 @@
 import Hexo from 'hexo';
 import path from 'path';
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { existsSync, createWriteStream, promises } from 'fs';
 import { Connection } from 'typeorm';
 import { InfoModel } from '../entity/info';
@@ -56,19 +56,38 @@ tags:`;
   return size;
 }
 
-const download = (url: string, dest: string) =>
-  axios({
-    url,
-    responseType: 'stream',
-  }).then(
-    response =>
-      new Promise<void>((resolve, reject) => {
-        response.data
-          .pipe(createWriteStream(dest))
-          .on('finish', () => resolve())
-          .on('error', (e: any) => reject(e));
-      }),
-  );
+const download = async (url: string, dest: string) => {
+  const resp = await _download(url);
+  if (resp === undefined) {
+    return;
+  }
+  return save(resp, dest);
+};
+
+const _download = async (url: string) => {
+  let retries = 0;
+  const maxRetries = 3;
+  while (retries < maxRetries) {
+    try {
+      const resposne = await axios({
+        url,
+        responseType: 'stream',
+      });
+      return resposne;
+    } catch(err) {
+      Logger.error(`下载错误: ${err}`);
+      retries += 1;
+    }
+  }
+  Logger.log(`下载失败次数太多了！！！`);
+}
+
+const save = (response:AxiosResponse,  dest: string) => new Promise<void>((resolve, reject) => {
+  response.data
+  .pipe(createWriteStream(dest))
+  .on('finish', () => resolve())
+  .on('error', (e: any) => reject(e));
+});
 
 const downloadAssets = async (model: InfoModel) => {
   const assetsDir = path.join(postDir, `${model.threadId}`);

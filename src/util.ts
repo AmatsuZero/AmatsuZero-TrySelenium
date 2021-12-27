@@ -27,12 +27,14 @@ dotenv.config();
 const PageCode = {
   NEW: 'forum-561',
   ACG: 'forum-231',
+  NOVEL: 'forum-383',
 }
 
 const SISPaths = {
   INDEX: "/bbs",
   NEW: `/bbs/${PageCode.NEW}`,
-  ACG: `bbs/${PageCode.ACG}`
+  ACG: `bbs/${PageCode.ACG}`,
+  NOVEL: `bbs/${PageCode.NOVEL}`
 }
 
 const hosts = [
