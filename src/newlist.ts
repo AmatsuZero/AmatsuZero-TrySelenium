@@ -177,12 +177,12 @@ class NewListPage {
     }
   }
 
-  protected threadsFilter(link: string) {
+  protected async threadsFilter(link: string) {
     if (this.dbRepo === undefined) {
       return true;
     }
     const id = getThreadId(link);
-    const model = this.dbRepo.findOne({ threadId: id, category: this.category() });
+    const model = await this.dbRepo.findOne({ threadId: id, category: this.category() });
     const needParse = model === undefined;
     if (!needParse) {
       Logger.log(`✈️ 跳过链接：${link}`);
