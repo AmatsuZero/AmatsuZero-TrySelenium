@@ -16,6 +16,9 @@ export class NovelDetail extends DetailPage {
       model.tag = this.tag;
       model.format = 'txt';
       await model.buildNovel();
+      model.title = await driver.getTitle();
+      model.title = model.title.split("-")[0];
+      model.title = model.title.trim();
       return model;
     } catch (e) {
       Logger.log(`❌ 提取小说出错：${this.href}`);
