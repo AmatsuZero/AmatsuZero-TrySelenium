@@ -164,6 +164,8 @@ const parseInitArgs = async () => {
       process.env.driverPath = arg.split("=")[1];
     } else if (arg.startsWith("--hexo")) {
       isHexo = true;
+    } else if (arg.startsWith("--checkIsPosted")) {
+      process.env.checkIsPosted = "true";
     }
   }
   createLogger(defaultLogPath);

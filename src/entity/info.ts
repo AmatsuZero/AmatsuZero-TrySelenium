@@ -49,6 +49,9 @@ class InfoModel {
   @Column("text", { nullable: true, default: "" })
   public tag = "";
 
+  @Column("boolean", { nullable: true, default: false })
+  public isPosted = false;
+
   private sourceElment: WebElement;
 
   public constructor(elm: WebElement, id: number) {

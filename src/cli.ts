@@ -2,7 +2,7 @@ import { Logger, parseInitArgs, prepareConnection } from './util';
 import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPage, parseNoveListPage } from './route';
 import { nameExtraction } from './name_extraction';
 import { Connection } from 'typeorm';
-import { createNewListPosts } from './pages';
+import { createPosts } from './pages';
 
 (async () => {
   let conn: Connection | null | undefined;
@@ -20,7 +20,7 @@ import { createNewListPosts } from './pages';
     } else if (pages.length > 0) {
       await specifiedPages(connection, pages);
     } else if (isHexo) {
-      await createNewListPosts(connection);
+      await createPosts(connection);
     } else {    
       await parseNewListPage(connection, startpage, hasHistoryData);
       await parseNoveListPage(connection, startpage, hasHistoryData);

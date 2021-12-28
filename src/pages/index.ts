@@ -2,18 +2,14 @@ import Hexo from 'hexo';
 import path from 'path';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { existsSync, createWriteStream, promises } from 'fs';
-import { Connection } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { InfoModel } from '../entity/info';
 import { Logger } from '../util';
-import { title } from 'process';
+import { checkPosts } from './check';
 
 const hexoDir = path.join(__dirname, '../..', 'hexo');
 const postDir = path.join(hexoDir, 'source/_posts');
-
-const hexo = new Hexo(hexoDir, {
-  debug: process.env.NODE_ENV === 'DEBUG',
-  config: path.join(hexoDir, '_config.yml')
-});
+const TriggerSize = 90 / 0.000001; // Github 单次提交上限是 100MB，这里略小于上限触发
 
 const handleChineseTags = (title: string) => {
   if (title.includes("麻豆")) {
@@ -134,30 +130,77 @@ const downloadAssets = async (model: InfoModel) => {
   return assetsDir;
 }
 
-export async function createNewListPosts(connection:Connection) {
+const writeNovel = async (model: InfoModel) => {
+  let content = `---
+title: ${model.title}
+tags:`;
+  content += `
+- ${model.tag}
+`;
+  content += `categories: ${model.category}\n`;
+  content += '---\n';
+  content += model.sig;
+
+  const dest = path.join(postDir, `${model.threadId}.md`);
+  await promises.writeFile(dest, content);
+  const stat = await promises.stat(dest);
+  return stat.size;
+};
+
+const createNovelPosts = async (repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
+  const entities = await repo.find({category: "new"});
+  let triggerSize = 0;
+  for (const entity of entities) {
+    if (ids.has(`${entity.threadId}`) || entity.isPosted) {
+      continue;
+    }
+    triggerSize += await writeNovel(entity);
+    if (triggerSize >= TriggerSize) {
+      await hexo.call('clean');
+      await hexo.call('deploy', {_ :["-g"]});
+      Logger.log(`生成接近 100MB，部署完成🍺`);
+      triggerSize = 0;
+    }
+  }
+};
+
+const createNewListPosts = async (repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
+  const entities = await repo.find({category: "new"});
+  let triggerSize = 0;
+  for (const entity of entities) {
+    if (ids.has(`${entity.threadId}`) || entity.isPosted) {
+      continue;
+    }
+    const assetDir = await downloadAssets(entity);
+    triggerSize += await writeContent(entity, assetDir);
+    Logger.log(`新作品帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
+    if (triggerSize >= TriggerSize) {
+      await hexo.call('clean');
+      await hexo.call('deploy', {_ :["-g"]});
+      Logger.log(`生成接近 100MB，部署完成🍺`);
+      triggerSize = 0;
+    }
+  }
+};
+
+export async function createPosts(connection:Connection) {
   const repo = connection.getRepository(InfoModel);
+  const hexo = new Hexo(hexoDir, {
+    debug: process.env.NODE_ENV === 'DEBUG',
+    config: path.join(hexoDir, '_config.yml')
+  });
   try {
+    await hexo.init();
+    if (process.env.checkIsPosted !== undefined) {
+      await checkPosts(repo, hexo);
+      return;
+    }
     let postsList = await promises.readdir(postDir);
     postsList = postsList.filter(post => path.extname(post) === '.md');
     postsList = postsList.map(filename => filename.split('.').slice(0, -1).join('.'));
-    const entities = await repo.find({category: "new"});
     const ids = new Set(postsList);
-    await hexo.init();
-    let triggerSize = 0;
-    for (const entity of entities) {
-      if (ids.has(`${entity.threadId}`)) {
-        continue;
-      }
-      const assetDir = await downloadAssets(entity);
-      triggerSize += await writeContent(entity, assetDir);
-      Logger.log(`帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
-      if (triggerSize * 0.000001 >= 90) { // Github 单次提交上限是 100MB，这里略小于上限触发
-        await hexo.call('clean');
-        await hexo.call('deploy', {_ :["-g"]});
-        Logger.log(`生成接近 100MB，部署完成🍺`);
-        triggerSize = 0;
-      }
-    }
+    await createNewListPosts(repo, ids, hexo);
+    await createNovelPosts(repo, ids, hexo);
   } catch (e) {
     Logger.error(e);
   } finally {
