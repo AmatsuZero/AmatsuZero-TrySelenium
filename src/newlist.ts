@@ -37,7 +37,13 @@ class NewListPage {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();
-        await block(links.filter(link => this.threadsFilter(link.href)));
+        const validLinks: ThreadInfo[] = [];
+        for (const link of links) {
+          if (await this.threadsFilter(link.href)) {
+            validLinks.push(link);
+          }
+        }
+        await block(validLinks);
         await this.nextPage();
       } catch (e) {
         ShouldCountinue();
