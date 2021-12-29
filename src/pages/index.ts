@@ -34,7 +34,7 @@ const handleChineseTags = (title: string) => {
 const writeContent = async (model: InfoModel, assetDir: string) => {
   let size = 0;
   let content = `---
-title: ${model.title}
+title: ${handleTile(model.title)}
 tags:`;
   content += `
 - ${model.tag}
@@ -130,16 +130,33 @@ const downloadAssets = async (model: InfoModel) => {
   return assetsDir;
 }
 
+// https://pengzhenghao.github.io/blog/2018/03/19/20180319bug2/
+  // https://chrischen0405.github.io/2018/11/21/post20181121-2/
+const handleTile = (originalTitle: string) => {
+  let title = originalTitle.replace(":", ":&ensp");
+  title = title.replace("[", "【");
+  title = title.replace("]", "]");
+  title = title.replace("\"", "");
+  return title;
+}
+
 const writeNovel = async (model: InfoModel) => {
   let content = `---
-title: ${model.title}
+title: ${handleTile(model.title)}
 tags:`;
   content += `
 - ${model.tag}
 `;
+  const breakLine = '\n<escape><!-- more --></escape>\n';
   content += `categories: ${model.category}\n`;
   content += '---\n';
-  content += model.sig;
+  let paragrah = model.sig;
+  let idx = paragrah.indexOf('字数');
+  idx = paragrah.indexOf('\n', idx);
+  if (idx !== -1) {
+    paragrah = [paragrah.slice(0, idx), breakLine, paragrah.slice(idx)].join('');
+  }
+  content += paragrah;
 
   const dest = path.join(postDir, `${model.threadId}.md`);
   await promises.writeFile(dest, content);
@@ -148,19 +165,24 @@ tags:`;
 };
 
 const createNovelPosts = async (repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
-  const entities = await repo.find({category: "new"});
+  const entities = await repo.find({category: "novel"});
   let triggerSize = 0;
   for (const entity of entities) {
     if (ids.has(`${entity.threadId}`) || entity.isPosted) {
       continue;
     }
     triggerSize += await writeNovel(entity);
+    Logger.log(`新小说帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
     if (triggerSize >= TriggerSize) {
       await hexo.call('clean');
       await hexo.call('deploy', {_ :["-g"]});
       Logger.log(`生成接近 100MB，部署完成🍺`);
       triggerSize = 0;
     }
+  }
+  if (triggerSize !== 0) {
+    await hexo.call('clean');
+    await hexo.call('deploy', {_ :["-g"]});
   }
 };
 
@@ -180,6 +202,10 @@ const createNewListPosts = async (repo: Repository<InfoModel>, ids: Set<string>,
       Logger.log(`生成接近 100MB，部署完成🍺`);
       triggerSize = 0;
     }
+  }
+  if (triggerSize !== 0) {
+    await hexo.call('clean');
+    await hexo.call('deploy', {_ :["-g"]});
   }
 };
 
