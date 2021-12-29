@@ -11,6 +11,12 @@ const ContentType = {
   CENSORED_COMICS: '有码漫画'
 };
 
+const getSplitValue = (str: string) => {
+  const separator = "：";
+  const value = str.split(separator)[1];
+  return value === undefined ? '' : value;
+};
+
 @Entity()
 class InfoModel {
   @PrimaryGeneratedColumn()
@@ -64,23 +70,22 @@ class InfoModel {
     const postId = await this.sourceElment.getAttribute("id");
     this.postId = postId.split("_")[1]; // 获取 post id
     const lines = (await this.sourceElment.getText()).split("\n");
-    const separator = "：";
     // 提取信息
     lines.forEach(str => {
       if (str.includes("影片名稱")) {
-        this.title = str.split(separator)[1];
+        this.title = getSplitValue(str);
       } else if (str.includes("影片格式")) {
-        this.format = str.split(separator)[1];
+        this.format = getSplitValue(str);
       } else if (str.includes("影片大小")|| str.includes("视频大小")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("影片時間")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("是否有碼")) {
-        this.blurVerification(str.split(separator)[1]);
+        this.blurVerification(getSplitValue(str));
       } else if (str.includes("特徵碼")) {
-        this.sig = str.split(separator)[1];
+        this.sig = getSplitValue(str);
       } else if (str.includes("出演女優")) {
-        const value = str.split(separator)[1];
+        const value = getSplitValue(str);
         const actors = value.length > 0 ? value.split(" ") : [];
         this.actors = actors.filter(name => name !== "等" 
         && name.replace(/[^\p{L}\p{N}\p{Z}]/gu, '').length > 0); // 过滤掉标点符号
@@ -172,71 +177,67 @@ class InfoModel {
   }
 
   protected async buildCollectionInfo(lines: string[]) {
-    const separator = "：";
     lines.forEach(str => {
       if (str.includes("影片名稱")) {
-        this.title = str.split(separator)[1];
+        this.title = getSplitValue(str);
       } else if (str.includes("影片格式")) {
-        this.format = str.split(separator)[1];
+        this.format = getSplitValue(str);
       } else if (str.includes("影片大小")|| str.includes("视频大小")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("影片時間")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("是否有碼")) {
-        this.blurVerification(str.split(separator)[1]);
+        this.blurVerification(getSplitValue(str));
       } else if (str.includes("种子特征码")) {
-        this.sig = str.split(separator)[1];
+        this.sig = getSplitValue(str);
       } 
     });
   }
 
   protected async buildGameInfo(lines: string[]) {
-    const separator = "：";
     lines.forEach(str => {
       if (str.includes("游戏名称")) {
-        this.title = str.split(separator)[1];
+        this.title = getSplitValue(str);
       } else if (str.includes("游戏格式")) {
-        this.format = str.split(separator)[1];
+        this.format = getSplitValue(str);
       } else if (str.includes("游戏大小")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("是否有碼")) {
-        this.blurVerification(str.split(separator)[1]);
+        this.blurVerification(getSplitValue(str));
       } else if (str.includes("种子特征码")) {
-        this.sig = str.split(separator)[1];
+        this.sig = getSplitValue(str);
       } 
     });
   }
 
   protected async buildComicsInfo(lines: string[]) {
-    const separator = "：";
     lines.forEach(str => {
       if (str.includes("漫画名称")) {
-        this.title = str.split(separator)[1];
+        this.title = getSplitValue(str);
       } else if (str.includes("漫画格式")) {
-        this.format = str.split(separator)[1];
+        this.format = getSplitValue(str);
       } else if (str.includes("漫画大小") || str.includes("文件大小")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("是否有碼") || str.includes("是否有碼")) {
-        this.blurVerification(str.split(separator)[1]);
+        this.blurVerification(getSplitValue(str));
       } else if (str.includes("种子特征码") || str.includes("特 徵 碼")) {
-        this.sig = str.split(separator)[1];
+        this.sig = getSplitValue(str);
       } 
     });
   }
 
   protected async buildCartoonInfo(lines: string[]) {
-    const separator = "：";
     lines.forEach(str => {
       if (str.includes("动画名称")) {
-        this.title = str.split(separator)[1];
+        this.title = getSplitValue(str);
       } else if (str.includes("动画格式")) {
-        this.format = str.split(separator)[1];
+        this.format = getSplitValue(str);
       } else if (str.includes("动画大小") || str.includes("文件大小")) {
-        this.size = str.split(separator)[1];
+        this.size = getSplitValue(str);
       } else if (str.includes("是否有碼") || str.includes("是否有碼") || str.includes("有码无码")) {
-        this.blurVerification(str.split(separator)[1]);
+        this.blurVerification(getSplitValue(str));
       } else if (str.includes("种子特征码") || str.includes("特 徵 碼")) {
-        this.sig = str.split(separator)[1];
+        this.sig = getSplitValue(str);
       } 
     });
   }
