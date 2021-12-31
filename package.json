@@ -78,6 +78,7 @@
    "homepage": "https://github.com/AmatsuZero/TrySelenium#readme",
    "dependencies": {
       "axios": "^0.24.0",
+      "cheerio": "^1.0.0-rc.10",
       "dotenv": "^10.0.0",
       "hexo": "^6.0.0",
       "reflect-metadata": "^0.1.10",

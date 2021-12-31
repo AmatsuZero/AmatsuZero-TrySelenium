@@ -33,7 +33,7 @@ class NewListPage {
     this.earliestid = earliestid;
   }
 
-  public async getAllThreadLinks(block: (hrefs: { href: string, tag: string }[]) => Promise<void>) {
+  public async getAllThreadLinks(block: (hrefs: ThreadInfo[]) => Promise<void>) {
     do {
       try {
         const links = await this.getAllThreadsOnCurrentPage();

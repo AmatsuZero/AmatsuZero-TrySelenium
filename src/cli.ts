@@ -1,5 +1,5 @@
 import { Logger, parseInitArgs, prepareConnection } from './util';
-import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPage, parseNoveListPage } from './route';
+import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPage, parseNoveListPage, parseWesternListPage } from './route';
 import { nameExtraction } from './name_extraction';
 import { Connection } from 'typeorm';
 import { createPosts } from './pages';
@@ -22,9 +22,10 @@ import { createPosts } from './pages';
     } else if (isHexo) {
       await createPosts(connection);
     } else {    
-      await parseNewListPage(connection, startpage, hasHistoryData);
-      await parseNoveListPage(connection, startpage, hasHistoryData);
-      await parseACGListPage(connection, startpage, hasHistoryData);
+      // await parseNewListPage(connection, startpage, hasHistoryData);
+      // await parseNoveListPage(connection, startpage, hasHistoryData);
+      // await parseACGListPage(connection, startpage, hasHistoryData);
+      await parseWesternListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');

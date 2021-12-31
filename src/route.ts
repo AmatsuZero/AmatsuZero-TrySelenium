@@ -6,6 +6,7 @@ import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
 import ACGDetailPage from './acgdetail';
 import { NovelDetail, NovelList } from './novellist';
+import { WesternList } from './western';
 
 const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
@@ -63,6 +64,8 @@ const parseNoveListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[
     }
   }
 };
+
+const parseWesternListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {}
 
 const beforeParse = async (connection: Connection, category: string, hasHistoryData: boolean) => {
   const host = await findAvailableHost();
@@ -122,6 +125,7 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
   const acgList = new ACGList(host, latestId, earliestId);
   const repo = connection.getRepository(InfoModel);
   acgList.currentPage = startPage;
+  acgList.dbRepo = repo;
   await acgList.getAllThreadLinks(async (hrefs) => parseACGListData(repo, hrefs));
   Logger.log('✨ 解析 ACG 列表结束');
 };
@@ -129,11 +133,23 @@ const parseACGListPage = async (connection: Connection, startPage: number, hasHi
 const parseNoveListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
   const { host, latestId, earliestId } = await beforeParse(connection, "novel", hasHistoryData);
   Logger.log('✨ 开始解析小说列表');
-  const acgList = new NovelList(host, latestId, earliestId);
+  const list = new NovelList(host, latestId, earliestId);
   const repo = connection.getRepository(InfoModel);
-  acgList.currentPage = startPage;
-  await acgList.getAllThreadLinks(async (hrefs) => parseNoveListData(repo, hrefs));
+  list.currentPage = startPage;
+  list.dbRepo = repo;
+  await list.getAllThreadLinks(async (hrefs) => parseNoveListData(repo, hrefs));
   Logger.log('✨ 解析小说列表结束');
+};
+
+const parseWesternListPage = async (connection: Connection, startPage: number, hasHistoryData: boolean) => {
+  const { host, latestId, earliestId } = await beforeParse(connection, "non-asian", hasHistoryData);
+  Logger.log('✨ 开始欧美区列表');
+  const list = new WesternList(host, latestId, earliestId);
+  const repo = connection.getRepository(InfoModel);
+  list.currentPage = startPage;
+  list.dbRepo = repo;
+  await list.getAllThreadLinks(async (hrefs) => parseWesternListData(repo, hrefs));
+  Logger.log('✨ 解析欧美区列表结束');
 };
 
 const updateNewTags = async (connection: Connection) => {
@@ -170,6 +186,7 @@ export {
   parseNewListPage,
   parseACGListPage,
   parseNoveListPage,
+  parseWesternListPage,
   updateNewTags,
   specifiedPages,
   resume,
