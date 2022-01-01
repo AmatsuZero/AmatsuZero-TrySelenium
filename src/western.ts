@@ -30,8 +30,15 @@ export class WesternList extends NewListPage {
         Logger.log(`📖 ${this.title()}一共${this.maxPage}页`);
       }
     }
-    $(`#${PageCode.Western}`).children('tbody').each((i, elm) => {
-      console.log(elm.attributes);
+    const host = `${this.host}bbs/`;
+    $('#wrapper > div:nth-child(1) > div.mainbox.threadlist > form').find("tbody[id]")
+    .filter((_, el) => {
+      const attr = $(el).attr("id");
+      return attr !== undefined ? attr.startsWith("normalthread_") : false;
+    }).each((_, el) => {
+      const tag = $(el).find("th > em > a").text() || '';
+      const href = $(el).find("th > span > a").attr("href") || '';
+      info.push(new ThreadInfo(host + href, tag));
     });
     return info;
   }

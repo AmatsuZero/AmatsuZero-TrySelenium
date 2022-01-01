@@ -52,6 +52,7 @@ const hosts = [
   "http://68.168.16.154/"
 ];
 
+let serviceBuilder: ServiceBuilder | undefined;
 const makeBrowser = async () => {
   const options = new Options();
   options.addArguments("--headless"); // 创建无头浏览器
@@ -59,8 +60,6 @@ const makeBrowser = async () => {
   options.addArguments("enable-automation");
   options.addArguments("start-maximized");
   const builder = new Builder().forBrowser(Browser.CHROME);
-  // vscode 插件下，chromedriver 路径也需要指定了
-  const location = process.env.driverPath;
   if (os.platform() === 'linux') {
     // 额外设置
     options.addArguments("--disable-dev-shm-usage");
@@ -71,7 +70,11 @@ const makeBrowser = async () => {
     options.addArguments("--disable-dev-shm-usage"); // https://stackoverflow.com/a/50725918/1689770
   }
   options.addArguments("–enable-low-end-device-mode"); // 开启低性能模式
-  const serviceBuilder = new ServiceBuilder(location);
+  if (serviceBuilder === undefined) {
+    // vscode 插件下，chromedriver 路径也需要指定了
+    const location = process.env.driverPath;
+    serviceBuilder = new ServiceBuilder(location);
+  }
   builder.setChromeService(serviceBuilder);
   return await builder.setChromeOptions(options).build();
 }
