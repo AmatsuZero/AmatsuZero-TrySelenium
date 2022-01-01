@@ -24,7 +24,7 @@ export class NovelDetail extends DetailPage {
       Logger.log(`❌ 提取小说出错：${this.href}`);
       Logger.error(e);
     } finally {
-      await driver.close();
+      await driver.quit();
     }
   }
 

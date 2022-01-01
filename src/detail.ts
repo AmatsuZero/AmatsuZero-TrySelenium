@@ -38,7 +38,7 @@ export default class DetailPage {
     } catch (e) {
       await this.handleException(e, driver);
     } finally {
-      await driver.close();
+      await driver.quit();
     }
   }
 

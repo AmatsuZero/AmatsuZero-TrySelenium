@@ -17,6 +17,8 @@ import { createInterface } from 'readline';
 import dotenv from "dotenv";
 import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
+import axios from 'axios';
+import cheerio from "cheerio";
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
@@ -84,6 +86,11 @@ const findAvailableHost = async () => {
   let driver: WebDriver | null | undefined;
   try {
     driver = await makeBrowser();
+  } catch {
+    await _cheerioFindAvailableHost();
+    return;
+  }
+  try {
     for (const host of hosts) {
       const bbs = new URL(SISPaths.INDEX, host)
       await driver.get(bbs.href);
@@ -102,6 +109,22 @@ const findAvailableHost = async () => {
   }
   return expectedHost;
 }
+
+const _cheerioFindAvailableHost = async () => {
+  try {
+    for (const host of hosts) {
+      const bbs = new URL(SISPaths.INDEX, host)
+      const res = await axios.get(bbs.href);
+      const $ = cheerio.load(res.data);
+      if ($("#nav > a").text() === expectedTitle) {
+        return host;
+      }
+    }
+  } catch(e) {
+    Logger.error(e);
+  }
+  return '';
+};
 
 let Logger: Console;
 

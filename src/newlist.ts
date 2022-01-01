@@ -200,7 +200,7 @@ class NewListPage {
     if (this.driver === undefined) {
       return
     }
-    await this.driver.close();
+    await this.driver.quit();
     this.driver = undefined;
   }
 
