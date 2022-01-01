@@ -1,6 +1,7 @@
 import Hexo from 'hexo';
 import path from 'path';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import retry from 'async-retry';
 import { existsSync, createWriteStream, promises } from 'fs';
 import { Connection, Repository } from 'typeorm';
 import { InfoModel } from '../entity/info';
@@ -88,22 +89,19 @@ const download = async (url: string, dest: string) => {
   return save(resp, dest);
 };
 
-const _download = async (url: string) => {
-  let retries = 0;
-  const maxRetries = 3;
-  while (retries < maxRetries) {
-    try {
-      const resposne = await axios({
-        url,
-        responseType: 'stream',
-      });
-      return resposne;
-    } catch(err) {
-      Logger.error(`下载错误: ${err}`);
-      retries += 1;
+const _download = async (url: string, retries = 3) => {
+  retry(async (bail) => {
+    const res = await axios({
+      url,
+      responseType: 'stream',
+    });
+    if (res.status === 403) {
+      // don't retry upon 403
+      bail(new Error('Unauthorized'));
+      return;
     }
-  }
-  Logger.log(`下载失败次数太多了！！！`);
+    return res;
+  }, {retries})
 }
 
 const save = (response:AxiosResponse,  dest: string) => new Promise<void>((resolve, reject) => {

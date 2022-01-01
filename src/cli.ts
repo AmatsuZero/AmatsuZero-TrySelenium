@@ -22,9 +22,9 @@ import { createPosts } from './pages';
     } else if (isHexo) {
       await createPosts(connection);
     } else {    
-      // await parseNewListPage(connection, startpage, hasHistoryData);
-      // await parseNoveListPage(connection, startpage, hasHistoryData);
-      // await parseACGListPage(connection, startpage, hasHistoryData);
+      await parseNewListPage(connection, startpage, hasHistoryData);
+      await parseNoveListPage(connection, startpage, hasHistoryData);
+      await parseACGListPage(connection, startpage, hasHistoryData);
       await parseWesternListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {

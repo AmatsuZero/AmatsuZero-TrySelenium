@@ -1,5 +1,6 @@
 import axios, { Axios } from "axios";
 import cheerio from "cheerio";
+import retry from 'async-retry';
 import { NewListPage, ThreadInfo } from "./newlist";
 import { Logger, PageCode, SISPaths } from "./util";
 
@@ -17,9 +18,10 @@ export class WesternList extends NewListPage {
 
   public async getAllThreadsOnCurrentPage(needClose?: boolean) {
     let info: ThreadInfo[] = [];
-    const response = await this.axios.get(this.currentPageURL(), {
-      responseType: 'document'
-    });
+    const response = await this.getResponse(this.currentPageURL());
+    if (response === undefined) {
+      return info;
+    }
     const $ = cheerio.load(response.data);
     if (this.maxPage === -1) {
       let link = $('#wrapper > div:nth-child(1) > div:nth-child(10) > div > a.last').attr('href');
@@ -41,6 +43,20 @@ export class WesternList extends NewListPage {
       info.push(new ThreadInfo(host + href, tag));
     });
     return info;
+  }
+
+  protected getResponse(url: string, retries = 5) {
+    return retry(async (bail) => {
+      const res = await this.axios.get(url, {
+        responseType: 'document'
+      });
+      if (res.status === 403) {
+        // don't retry upon 403
+        bail(new Error('Unauthorized'));
+        return;
+      }
+      return res;
+    } , {retries})
   }
 
   protected currentPageURL(): string {
