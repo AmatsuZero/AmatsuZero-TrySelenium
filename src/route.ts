@@ -97,7 +97,6 @@ const beforeParse = async (connection: Connection, category: string, hasHistoryD
     Logger.log("💻 本地没有历史数据，全新开始～");
   } else {
     const repo = connection.getRepository(InfoModel);
-    const cnt = await repo.count();
     Logger.log("💻 有历史数据，更新添加～");
     // 查找最后和最新一条数据的 thread id
     const latest = await repo.findOne({

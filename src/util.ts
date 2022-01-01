@@ -86,11 +86,6 @@ const findAvailableHost = async () => {
   let driver: WebDriver | null | undefined;
   try {
     driver = await makeBrowser();
-  } catch {
-    await _cheerioFindAvailableHost();
-    return;
-  }
-  try {
     for (const host of hosts) {
       const bbs = new URL(SISPaths.INDEX, host)
       await driver.get(bbs.href);
@@ -102,6 +97,7 @@ const findAvailableHost = async () => {
     }
   } catch(e) {
     Logger.error(e);
+    expectedHost = await _cheerioFindAvailableHost();
   } finally {
     if (driver !== null && driver !== undefined) {
       await driver.quit();
@@ -116,7 +112,7 @@ const _cheerioFindAvailableHost = async () => {
       const bbs = new URL(SISPaths.INDEX, host)
       const res = await axios.get(bbs.href);
       const $ = cheerio.load(res.data);
-      if ($("#nav > a").text() === expectedTitle) {
+      if ($("title").text().replace("  ", " ").trim() === expectedTitle) {
         return host;
       }
     }
