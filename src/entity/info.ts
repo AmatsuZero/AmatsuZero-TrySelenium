@@ -14,7 +14,7 @@ const ContentType = {
 const getSplitValue = (str: string) => {
   const separator = "：";
   const value = str.split(separator)[1];
-  return value === undefined ? '' : value;
+  return value === undefined ? '' : value.trim();
 };
 
 @Entity()
@@ -58,15 +58,18 @@ class InfoModel {
   @Column("boolean", { nullable: true, default: false })
   public isPosted = false;
 
-  private sourceElment: WebElement;
+  private sourceElment?: WebElement;
 
-  public constructor(elm: WebElement, id: number) {
+  public constructor(elm: WebElement | undefined, id: number) {
     this.sourceElment = elm;
     this.threadId = id;
     this.isBlurred = true;
   }
 
   public async build() {
+    if (this.sourceElment === undefined) {
+      return;
+    }
     const postId = await this.sourceElment.getAttribute("id");
     this.postId = postId.split("_")[1]; // 获取 post id
     const lines = (await this.sourceElment.getText()).split("\n");
@@ -103,6 +106,9 @@ class InfoModel {
   }
 
   public async buildNovel() {
+    if (this.sourceElment === undefined) {
+      return;
+    }
     const id = await this.sourceElment.getAttribute("id");
     this.postId = id.split("_")[1];
     const div = await this.sourceElment.findElement(By.className('t_msgfont noSelect'));
@@ -141,6 +147,9 @@ class InfoModel {
   }
 
   public async buildACG() {
+    if (this.sourceElment === undefined) {
+      return;
+    }
     const postId = await this.sourceElment.getAttribute("id");
     this.postId = postId.split("_")[1]; // 获取 post id
     const lines = (await this.sourceElment.getText()).split("\n");
@@ -253,5 +262,6 @@ class InfoModel {
 }
 
 export {
-  InfoModel
+  InfoModel,
+  getSplitValue
 }

@@ -6,7 +6,7 @@ import { findAvailableHost, Logger, ShouldCountinue } from './util';
 import ACGList from './acglist';
 import ACGDetailPage from './acgdetail';
 import { NovelDetail, NovelList } from './novellist';
-import { WesternList } from './western';
+import { WesternDetail, WesternList } from './western';
 
 const parseNewlistData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
   for (const href of hrefs) {
@@ -65,7 +65,24 @@ const parseNoveListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[
   }
 };
 
-const parseWesternListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {}
+const parseWesternListData = async (repo: Repository<InfoModel>, hrefs: ThreadInfo[]) => {
+  for (const href of hrefs) {
+    Logger.log(`🔍 即将解析欧美区详情页面：${href.href}`);
+    const detail = new WesternDetail(href.href, href.tag);
+    try {
+      const info = await detail.extractInfo();
+      if (info === undefined) {
+        continue;
+      }
+      await repo.save(info);
+      Logger.log(`🍺 解析完成: ${href.tag}-${info.title}`);
+    } catch (e) {
+      ShouldCountinue();
+      Logger.error(`❌ 解析保存失败: ${href.tag}-${href.href}`);
+      Logger.error(e);
+    }
+  }
+};
 
 const beforeParse = async (connection: Connection, category: string, hasHistoryData: boolean) => {
   const host = await findAvailableHost();
