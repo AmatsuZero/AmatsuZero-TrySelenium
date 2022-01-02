@@ -4,11 +4,6 @@ import DetailPage from "./detail";
 
 export class WesternList extends NewListPage {
 
-  protected async nextPage() {
-    this.currentPage += 1;
-    Logger.log("🏃 进入到下一页");
-  }
-
   protected currentPageURL(): string {
     return `${SISPaths.NONASIONA}-${this.currentPage}.html`
   }
@@ -23,6 +18,10 @@ export class WesternList extends NewListPage {
 
   protected category() {
     return "western"
+  }
+
+  protected maxPageSelector() {
+    return '#wrapper > div:nth-child(1) > div:nth-child(10) > div > a.last';
   }
 }
 

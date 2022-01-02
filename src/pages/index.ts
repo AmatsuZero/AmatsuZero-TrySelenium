@@ -84,16 +84,17 @@ tags:`;
 const download = async (url: string, dest: string) => {
   const resp = await _download(url);
   if (resp === undefined) {
-    return;
+    throw new Error("下载失败");
   }
   return save(resp, dest);
 };
 
 const _download = async (url: string, retries = 3) => {
-  retry(async (bail) => {
+  return await retry(async (bail) => {
     const res = await axios({
       url,
       responseType: 'stream',
+      insecureHTTPParser: true,
     });
     if (res.status === 403) {
       // don't retry upon 403
@@ -101,7 +102,9 @@ const _download = async (url: string, retries = 3) => {
       return;
     }
     return res;
-  }, {retries})
+  }, {retries, onRetry: (e, attemp)=> {
+    console.error(e);
+  }})
 }
 
 const save = (response:AxiosResponse,  dest: string) => new Promise<void>((resolve, reject) => {

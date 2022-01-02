@@ -9,3 +9,14 @@ pip3 install -r requirements.txt
 
 python3 -m spacy download ja_core_news_sm
 ```
+
+### CentOS 安装 Anaconda
+```sh
+yum install -y bzip2
+
+wget https://repo.continuum.io/archive/Anaconda3-5.3.0-Linux-x86_64.sh
+
+bash Anaconda3-5.3.0-Linux-x86_64.sh
+
+source ~/.bashrc
+```

@@ -126,8 +126,8 @@ export default class DetailPage {
     });
   }
 
-  protected getResponse(url: string, retries = 3) {
-    return retry(async (bail) => {
+  protected async getResponse(url: string, retries = 3) {
+    return await retry(async (bail) => {
       const res = await axios.get(url, {
         responseType: 'document'
       });

@@ -1,6 +1,6 @@
 import axios, { Axios } from "axios";
 import retry from 'async-retry';
-import cheerio from "cheerio";
+import cheerio, { CheerioAPI } from "cheerio";
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { Repository } from "typeorm";
 import { URL } from "url";
@@ -124,13 +124,7 @@ class NewListPage {
     const response = await this.getResponse(url);
     const $ = cheerio.load(response.data);
     if (this.maxPage === -1) {
-      let link = $('#wrapper > div:nth-child(1) > div:nth-child(9) > div > a.last').attr('href');
-      if (link !== undefined) {
-        link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
-        link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
-        this.maxPage = parseInt(link.split(`${this.pathReplacement()}-`)[1], 10);
-        Logger.log(`📖 ${this.title()}一共${this.maxPage}页`);
-      }
+      await this.cheerioFindMaxPage($);
     }
     const host = `${this.host}bbs/`;
     $('#wrapper > div:nth-child(1) > div.mainbox.threadlist > form').find("tbody[id]")
@@ -145,8 +139,22 @@ class NewListPage {
     return info;
   }
 
-    protected getResponse(url: string, retries = 3) {
-    return retry(async (bail) => {
+  protected maxPageSelector() {
+    return '#wrapper > div:nth-child(1) > div:nth-child(9) > div > a.last';
+  }
+
+  protected async cheerioFindMaxPage($: CheerioAPI) {
+    let link = $(this.maxPageSelector()).attr('href');
+    if (link !== undefined) {
+      link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
+      link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
+      this.maxPage = parseInt(link.split(`${this.pathReplacement()}-`)[1], 10);
+      Logger.log(`📖 ${this.title()}一共${this.maxPage}页`);
+    }
+  }
+
+  protected async getResponse(url: string, retries = 3) {
+    return await retry(async (bail) => {
       const res = await this.axios.get(url, {
         responseType: 'document'
       });
