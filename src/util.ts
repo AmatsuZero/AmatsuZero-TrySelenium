@@ -82,6 +82,9 @@ const makeBrowser = async () => {
 }
 
 const findAvailableHost = async () => {
+  if (!process.env.useTrySelenium) {
+    return await _cheerioFindAvailableHost();
+  }
   let expectedHost = '';
   let driver: WebDriver | null | undefined;
   try {
@@ -190,6 +193,8 @@ const parseInitArgs = async () => {
       isHexo = true;
     } else if (arg.startsWith("--checkIsPosted")) {
       process.env.checkIsPosted = "true";
+    } else if (arg.startsWith("--useTrySelenium")) {
+      process.env.useTrySelenium = "true";
     }
   }
   createLogger(defaultLogPath);

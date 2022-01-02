@@ -1,3 +1,6 @@
+import axios, { Axios } from "axios";
+import retry from 'async-retry';
+import cheerio from "cheerio";
 import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { Repository } from "typeorm";
 import { URL } from "url";
@@ -26,11 +29,16 @@ class NewListPage {
   public latestId: number;
   public earliestid: number;
   public dbRepo?: Repository<InfoModel>;
+  protected axios: Axios;
 
   public constructor(host: string, latestId: number, earliestid: number) {
     this.host = host;
     this.latestId = latestId;
     this.earliestid = earliestid;
+    this.axios = axios.create({
+      baseURL: this.host,
+      timeout: 1000,
+    });
   }
 
   public async getAllThreadLinks(block: (hrefs: ThreadInfo[]) => Promise<void>) {
@@ -83,6 +91,9 @@ class NewListPage {
   }
 
   public async getAllThreadsOnCurrentPage(needClose = false) {
+    if (!process.env.useTrySelenium) {
+      return this.cheerioGetAllThreadsOnCurrentPage();
+    }
     if (this.driver === undefined) {
       this.driver = await makeBrowser();
     }
@@ -104,6 +115,47 @@ class NewListPage {
       this.destroy();
     }
     return this.extractLinks(elms);
+  }
+
+  protected async cheerioGetAllThreadsOnCurrentPage() {
+    let info: ThreadInfo[] = [];
+    const url = this.currentPageURL();
+    Logger.log(`🔗 即将打开${this.title()}第${this.currentPage}页：${url}`);
+    const response = await this.getResponse(url);
+    const $ = cheerio.load(response.data);
+    if (this.maxPage === -1) {
+      let link = $('#wrapper > div:nth-child(1) > div:nth-child(9) > div > a.last').attr('href');
+      if (link !== undefined) {
+        link = link.substring(link.lastIndexOf('/') + 1); // 获取最后一部分
+        link = link.split('.').slice(0, -1).join('.'); // 去掉扩展名
+        this.maxPage = parseInt(link.split(`${this.pathReplacement()}-`)[1], 10);
+        Logger.log(`📖 ${this.title()}一共${this.maxPage}页`);
+      }
+    }
+    const host = `${this.host}bbs/`;
+    $('#wrapper > div:nth-child(1) > div.mainbox.threadlist > form').find("tbody[id]")
+    .filter((_, el) => {
+      const attr = $(el).attr("id");
+      return attr !== undefined ? attr.startsWith("normalthread_") : false;
+    }).each((_, el) => {
+      const tag = $(el).find("th > em > a").text() || '';
+      const href = $(el).find("th > span > a").attr("href") || '';
+      info.push(new ThreadInfo(host + href, tag));
+    });
+    return info;
+  }
+
+    protected getResponse(url: string, retries = 3) {
+    return retry(async (bail) => {
+      const res = await this.axios.get(url, {
+        responseType: 'document'
+      });
+      if (res.status === 403) {
+        // don't retry upon 403
+        bail(new Error('Unauthorized'));
+      }
+      return res;
+    } , {retries})
   }
 
   protected category() {
@@ -146,7 +198,12 @@ class NewListPage {
   }
 
   protected async nextPage() {
-    if (this.driver === undefined || this.currentPage >= this.maxPage) {
+    if (this.driver === undefined) {
+      this.currentPage += 1;
+      Logger.log("🏃 进入到下一页");
+      return;
+    }
+    if (this.currentPage >= this.maxPage) {
       this.destroy();
       return
     }

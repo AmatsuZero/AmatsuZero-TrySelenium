@@ -1,7 +1,11 @@
 import { URL } from 'url';
 import { By, WebDriver } from "selenium-webdriver";
-import { InfoModel } from "./entity/info";
+import { getSplitValue, InfoModel } from "./entity/info";
 import { makeBrowser, Logger, getThreadId, ShouldCountinue } from "./util";
+import path from 'path';
+import axios, { Axios } from "axios";
+import retry from 'async-retry';
+import cheerio from "cheerio";
 
 const MaxRetryCount = 3;
 const SleepTime = 1000;
@@ -25,6 +29,9 @@ export default class DetailPage {
   }
 
   public async extractInfo() {
+    if (!process.env.useTrySelenium) {
+      return this.cheerioExtractInfo();
+    }
     const driver = await makeBrowser();
     try {
       await driver.get(this.href);
@@ -40,6 +47,96 @@ export default class DetailPage {
     } finally {
       await driver.quit();
     }
+  }
+
+  protected async cheerioExtractInfo() {
+    const response = await this.getResponse(this.href);
+    if (response === undefined) {
+      return undefined;
+    }
+    const $ = cheerio.load(response.data);
+    if ($("#wrapper > div:nth-child(1) > div.box.message > p:nth-child(2)").text() === '您无权进行当前操作，这可能因以下原因之一造成') { // 无权查看，跳过
+      return undefined;
+    }
+    const model = new InfoModel(undefined, this.threadId());
+    model.category = this.category();
+    model.tag = this.tag;
+    model.isBlurred = false;
+    const msgFont = $("div.t_msgfont").first();
+    model.postId = msgFont.attr("id") || '';
+    model.postId = model.postId.split("_")[1] || ''; // 获取 post id
+    const text = $(`#postmessage_${model.postId}`).text();
+    this.build(model, text.split("\n"));
+    if (model.title.length === 0 || model.title === '---') {
+      model.title = $(`#pid${model.postId} > tbody > tr:nth-child(1) > td.postcontent > div.postmessage.defaultpost > h2`).text();
+    }
+    // 提取图片
+    $(`#postmessage_${model.postId} > img`)
+    .map((_, el) => $(el).attr("src"))
+    .filter((_, link) => {
+      const extName = path.extname(link); // gif 图片是宣传图片，需要过滤掉
+      return link.length > 0 && extName !== '.gif';
+    }).each((_, link) => { model.thumbnails.push(link) });
+    
+    const link = $(`#pid${model.postId} > tbody > tr:nth-child(1) > ` + 
+    'td.postcontent > div.postmessage.defaultpost > ' + 
+    'div.box.postattachlist > dl.t_attachlist > dt > a')
+    .filter((_, el) => {
+      const href = $(el).attr("href") || '';
+      const url = new URL(href, this.href);
+      return url.pathname === '/bbs/attachment.php';
+    }).attr("href");
+    if (link !== undefined) {
+      await this.cheerioGetTorrentLink(model, link);
+    } else { // 没有提取到种子，跳过
+      return undefined;
+    }
+    return model;
+  }
+
+  protected async cheerioGetTorrentLink(model: InfoModel, downloadURL: string) {
+    let url = new URL(downloadURL, this.href);
+    Logger.log(`🔗 即将提取种子链接: ${url.href}`);
+    const response = await this.getResponse(url.href);
+    const $ = cheerio.load(response.data);
+    const link = $("#downloadBtn").attr("href") || '';
+    url = new URL(link, this.href);
+    model.torrentLink = url.href;
+  }
+
+  protected build(model: InfoModel, lines: string[]) {
+    // 提取信息
+    lines.forEach(str => {
+      if (str.includes("影片名稱")) {
+        model.title = getSplitValue(str);
+      } else if (str.includes("影片格式")) {
+        model.format = getSplitValue(str);
+      } else if (str.includes("影片大小")|| str.includes("视频大小")) {
+        model.size = getSplitValue(str);
+      } else if (str.includes("影片時間")) {
+        model.size = getSplitValue(str);
+      } else if (str.includes("特徵碼") || str.includes("特 徵 碼")) {
+        model.sig = getSplitValue(str);
+      } else if (str.includes("出演女優")) {
+        const value = getSplitValue(str);
+        const actors = value.length > 0 ? value.split(",") : [];
+        model.actors = actors.filter(name => name !== "等" 
+        && name.replace(/[^\p{L}\p{N}\p{Z}]/gu, '').length > 0); // 过滤掉标点符号
+      }
+    });
+  }
+
+  protected getResponse(url: string, retries = 3) {
+    return retry(async (bail) => {
+      const res = await axios.get(url, {
+        responseType: 'document'
+      });
+      if (res.status === 403) {
+        // don't retry upon 403
+        bail(new Error('Unauthorized'));
+      }
+      return res;
+    } , {retries})
   }
 
   protected async handleException(e: any, driver: WebDriver) {
