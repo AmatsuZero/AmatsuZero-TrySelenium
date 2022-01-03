@@ -37,7 +37,7 @@ export async function checkPosts(repo: Repository<InfoModel>, hexo: Hexo) {
     Logger.log('❌ 检查是否创建过帖子出错');
     Logger.error(e);
   } finally {
-    await driver.close();
+    await driver.quit();
   }
 }
 

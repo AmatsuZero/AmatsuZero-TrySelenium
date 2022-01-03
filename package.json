@@ -85,7 +85,8 @@
       "reflect-metadata": "^0.1.10",
       "selenium-webdriver": "^4.1.0",
       "sqlite3": "^5.0.2",
-      "typeorm": "0.2.41"
+      "typeorm": "0.2.41",
+      "yargs": "^17.3.1"
    },
    "devDependencies": {
       "@babel/core": "^7.16.0",
@@ -98,6 +99,7 @@
       "@types/node": "^16.11.11",
       "@types/selenium-webdriver": "^4.0.16",
       "@types/vscode": "^1.63.0",
+      "@types/yargs": "^17.0.8",
       "@typescript-eslint/eslint-plugin": "^5.5.0",
       "@typescript-eslint/parser": "^5.5.0",
       "@vscode/test-electron": "^2.0.0",
