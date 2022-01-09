@@ -1,5 +1,5 @@
-import { NewListPage, ThreadInfo } from "./newlist";
-import { Logger, PageCode, SISPaths } from "./util";
+import { NewListPage } from "./newlist";
+import { PageCode, SISPaths } from "./util";
 import DetailPage from "./detail";
 
 export class WesternList extends NewListPage {

@@ -16,7 +16,8 @@
    ],
    "activationEvents": [
       "onCommand:video-previewer.parseNewList",
-      "onCommand:video-previewer.parseACGList"
+      "onCommand:video-previewer.parseACGList",
+      "onCommand:video-previewer.generatePosts"
    ],
    "contributes": {
       "commands": [
@@ -27,6 +28,10 @@
          {
             "command": "video-previewer.parseACGList",
             "title": "解析ACG作品列表"
+         },
+         {
+            "command": "video-previewer.generatePosts",
+            "title": "创建 Github Pages 帖子"
          }
       ],
       "configuration": [
@@ -44,6 +49,19 @@
                "sis001-downloader.chromeDriverPath": {
                   "type": "string",
                   "description": "chromedriver 路径"
+               }
+            }
+         },
+         {
+            "title": "Google Drive",
+            "properties": {
+               "sis001-downloader.gdTokenPath": {
+                  "type": "string",
+                  "description": "Google Drive token 存储位置"
+               },
+               "sis001-downloader.credentials": {
+                  "type": "string",
+                  "description": "Google Drive OAuth 凭据 JSON 存储位置"
                }
             }
          }
@@ -81,6 +99,7 @@
       "axios": "^0.24.0",
       "cheerio": "^1.0.0-rc.10",
       "dotenv": "^10.0.0",
+      "googleapis": "^92.0.0",
       "hexo": "^6.0.0",
       "reflect-metadata": "^0.1.10",
       "selenium-webdriver": "^4.1.0",
@@ -94,6 +113,7 @@
       "@babel/preset-env": "^7.16.4",
       "@babel/preset-typescript": "^7.16.0",
       "@types/async-retry": "^1.4.3",
+      "@types/gapi": "^0.0.41",
       "@types/hexo": "^3.8.7",
       "@types/jest": "^27.0.3",
       "@types/node": "^16.11.11",

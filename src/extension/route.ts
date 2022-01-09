@@ -49,13 +49,19 @@ const parseACGList = async (ctx: ExtensionContext, startPage = 1) => {
 	}
 };
 
+const generatePosts = async (ctx: ExtensionContext) => {
+  window.showInformationMessage('⚙️ 开始生成帖子！');  
+};
+
 const Commands = {
   ParseNewListCommand: 'video-previewer.parseNewList',
   ParseACGListCommand: 'video-previewer.parseACGList',
+  GeneratePostsCommand: 'video-previewer.generatePosts'
 };
 
 export {
   parseNewList,
   parseACGList,
-  Commands
+  Commands,
+  generatePosts,
 }

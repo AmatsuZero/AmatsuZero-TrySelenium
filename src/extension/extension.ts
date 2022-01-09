@@ -1,7 +1,7 @@
 import path from 'path';
 import * as vscode from 'vscode';
 import { createLogger, Logger, processLogByLine } from '../util';
-import { Commands, parseACGList, parseNewList } from './route';
+import { Commands, generatePosts, parseACGList, parseNewList } from './route';
 
 const getLoggerPath = async (ctx: vscode.ExtensionContext) => {
 	let loggerPath = vscode.workspace.getConfiguration("sis001-downloader").get("logger") as string; // 先从配置获取位置
@@ -26,6 +26,8 @@ const activate = async (context: vscode.ExtensionContext) => {
 		async () => await parseNewList(context, startPage)));
 	context.subscriptions.push(vscode.commands.registerCommand(Commands.ParseACGListCommand, 
 		async () => await parseACGList(context, startPage)));
+	context.subscriptions.push(vscode.commands.registerCommand(Commands.GeneratePostsCommand, 
+		async () => await generatePosts(context)));
 }
 
 const deactivate = () => {};
