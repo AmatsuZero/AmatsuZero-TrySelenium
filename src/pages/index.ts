@@ -103,7 +103,7 @@ const _download = async (url: string, retries = 3) => {
     }
     return res;
   }, {retries, onRetry: (e, attemp)=> {
-    console.error(e);
+    Logger.error(e);
   }})
 }
 

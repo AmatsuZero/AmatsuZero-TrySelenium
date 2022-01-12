@@ -1,5 +1,5 @@
 import { OAuth2Client, Credentials } from 'google-auth-library';
-import { google } from 'googleapis'; 
+import { drive_v3, google } from 'googleapis'; 
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import readline from 'readline';
@@ -53,13 +53,29 @@ const openURL = (url: string) => {
   return exec(`${opener} "${url.replace(/"/g, '\\\"')}"`);
 };
 
-const getAccessTokenNode = async (oAuth2Clinet: OAuth2Client) => {
+const getAccessTokenNTerminal = (oAuth2Clinet: OAuth2Client, tokenPath: string) => new Promise((resolve, reject) => {
   const authUrl = oAuth2Clinet.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
   });
   Logger.log('Authorize this app by visiting this url:', authUrl);
-};
+  openURL(authUrl);
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  rl.question('Enter the code from that page here: ', (code) => {
+    rl.close();
+    oAuth2Clinet.getToken(code)
+    .then(response => {
+      oAuth2Clinet.setCredentials(response.tokens);
+      return response.tokens;
+    })
+    .then(tokens => persistenceOfToken(tokenPath, tokens))
+    .then(tokens => resolve(tokens))
+    .catch(err => reject(err));
+  });
+})
 
 const InitDriver = async (credentilaPath: string, tokenPath: string, getAccessToken: (client: OAuth2Client) => Promise<Credentials>) => {
   const content = await fs.readFile(credentilaPath, 'utf8');
@@ -71,14 +87,29 @@ const InitDriver = async (credentilaPath: string, tokenPath: string, getAccessTo
 const persistenceOfToken = async (tokenPath: string, tokens: Credentials) => {
   const str = JSON.stringify(tokens);
   await fs.writeFile(tokenPath, str);
+  return tokens
 };
 
-const createFolder = async () => {
-
+const createFolder = async (driver: drive_v3.Drive, folderName: string) => {
+  const file = await driver.files.create({
+    fields: 'id',
+    requestBody: {
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder'
+    }
+  });
+  return file.data.id;
 }
+
+const uploadLoadImage = async () => {
+
+};
 
 export {
   InitDriver,
   SCOPES,
-  persistenceOfToken
+  persistenceOfToken,
+  getAccessTokenNTerminal,
+  createFolder,
+  uploadLoadImage
 }
