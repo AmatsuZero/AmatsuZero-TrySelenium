@@ -2,11 +2,12 @@ import Hexo from 'hexo';
 import path from 'path';
 import axios, { AxiosResponse } from 'axios';
 import retry from 'async-retry';
-import { existsSync, createWriteStream, promises } from 'fs';
+import { promises } from 'fs';
 import { Connection, Repository } from 'typeorm';
 import { InfoModel } from '../entity/info';
 import { Logger } from '../util';
 import { checkPosts } from './check';
+import { createFolder, createUploadFileMetaData, GetGoogleDriver, uploadLoadImage } from './google';
 
 const hexoDir = path.join(__dirname, '../..', 'hexo');
 const postDir = path.join(hexoDir, 'source/_posts');
@@ -81,12 +82,13 @@ tags:`;
   return size;
 }
 
-const download = async (url: string, dest: string) => {
+const download = async (url: string, idx: number, folderId: string) => {
   const resp = await _download(url);
   if (resp === undefined) {
     throw new Error("下载失败");
   }
-  return save(resp, dest);
+  const name = `${idx}${path.extname(url)}`;
+  return save(resp, name, folderId);
 };
 
 const _download = async (url: string, retries = 3) => {
@@ -107,27 +109,26 @@ const _download = async (url: string, retries = 3) => {
   }})
 }
 
-const save = (response:AxiosResponse,  dest: string) => new Promise<void>((resolve, reject) => {
-  response.data
-  .pipe(createWriteStream(dest))
-  .on('finish', () => resolve())
-  .on('error', (e: any) => reject(e));
-});
+const save = async (response:AxiosResponse, name: string, folderId: string) => {
+  const driver = GetGoogleDriver();
+  const params = createUploadFileMetaData(response, name, folderId);
+  await uploadLoadImage(driver, params);
+}
 
 const downloadAssets = async (model: InfoModel) => {
-  const assetsDir = path.join(postDir, `${model.threadId}`);
-  if (existsSync(assetsDir)) {
-    await promises.rmdir(assetsDir, { recursive: true,});
+  // 创建文件夹
+  const driver = GetGoogleDriver();
+  const assetsDir = await createFolder(driver, `${model.threadId}`);
+  if (!assetsDir || assetsDir.length === 0) {
+    throw new Error(`创建文件夹失败：${model.threadId}`);
   }
-  await promises.mkdir(assetsDir, { recursive: true });
   let idx = 0;
   for (const pic of model.thumbnails) {
-    const dest = path.join(assetsDir, `${idx}${path.extname(pic)}`);
-    await download(pic, dest);
+    await download(pic, idx, assetsDir);
     idx += 1;
   }
   const dest = path.join(assetsDir, `${model.postId}.torrent`);
-  await download(model.torrentLink, dest);
+  await download(model.torrentLink, 0, dest);
   return assetsDir;
 }
 

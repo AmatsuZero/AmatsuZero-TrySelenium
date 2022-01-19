@@ -1,10 +1,11 @@
 import { OAuth2Client, Credentials } from 'google-auth-library';
 import { drive_v3, google } from 'googleapis'; 
 import fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync, createReadStream } from 'fs';
 import readline from 'readline';
 import { exec } from 'child_process';
 import { Logger } from '../util';
+import { AxiosResponse } from 'axios';
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
@@ -75,13 +76,25 @@ const getAccessTokenNTerminal = (oAuth2Clinet: OAuth2Client, tokenPath: string) 
     .then(tokens => resolve(tokens))
     .catch(err => reject(err));
   });
-})
+});
 
+let _driver: drive_v3.Drive | null;
 const InitDriver = async (credentilaPath: string, tokenPath: string, getAccessToken: (client: OAuth2Client) => Promise<Credentials>) => {
+  if (_driver !== null) {
+    return _driver;
+  }
   const content = await fs.readFile(credentilaPath, 'utf8');
   const credentilas = JSON.parse(content) as OAuthCredentials;
   const auth = await authorize(credentilas, tokenPath, getAccessToken);
-  return google.drive({version: 'v3', auth});
+  _driver = google.drive({version: 'v3', auth});
+  return _driver;
+};
+
+const GetGoogleDriver = () => {
+  if (_driver === null) {
+    throw new Error("请先初始化！！！");
+  }
+  return _driver;
 };
 
 const persistenceOfToken = async (tokenPath: string, tokens: Credentials) => {
@@ -101,8 +114,24 @@ const createFolder = async (driver: drive_v3.Drive, folderName: string) => {
   return file.data.id;
 }
 
-const uploadLoadImage = async () => {
+const createUploadFileMetaData = (rsp: AxiosResponse, name: string, folerId:string): drive_v3.Params$Resource$Files$Create => {
+  const requestBody = {
+    name,
+    parents: [folerId]
+  };
+  const media = {
+    mimeType: 'image/jpeg',
+    body: createReadStream(rsp.data)
+  };
+  return {
+    media,
+    fields: 'id',
+    requestBody
+  }
+};
 
+const uploadLoadImage = async (driver: drive_v3.Drive, fileParam: drive_v3.Params$Resource$Files$Create) => {
+  const file = await driver.files.create(fileParam);
 };
 
 export {
@@ -111,5 +140,7 @@ export {
   persistenceOfToken,
   getAccessTokenNTerminal,
   createFolder,
-  uploadLoadImage
+  uploadLoadImage,
+  GetGoogleDriver,
+  createUploadFileMetaData
 }

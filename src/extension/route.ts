@@ -4,20 +4,27 @@ import { promisify } from 'util';
 import { ExtensionContext, workspace, window } from 'vscode';
 import { Logger, prepareConnection } from '../util';
 import { parseNewListPage, parseACGListPage } from '../route';
+import { createPosts } from '../pages';
+import { initDriver } from './google';
 
 const mkdir = promisify(fs.mkdir);
+
+const getDataFolderPath = async (ctx: ExtensionContext) => {
+  let dirPath = ctx.globalStorageUri.fsPath;
+  if (!fs.existsSync(dirPath)) {
+    dirPath = path.normalize(path.join(dirPath, '..')); // 父文件夹一定存在
+    dirPath = path.join(dirPath, 'sis001-downloadwer-data');
+    if (!fs.existsSync(dirPath)) {
+      await mkdir(dirPath);
+    }
+  }
+  return dirPath;
+}
 
 const getDBPath = async (ctx: ExtensionContext) => {
 	let database = workspace.getConfiguration("sis001-downloader").get("database") as string; // 先从配置获取位置
     if (database === undefined || database.length === 0) {
-      database = ctx.globalStorageUri.fsPath;
-      if (!fs.existsSync(database)) {
-        database = path.normalize(path.join(database, '..')); // 父文件夹一定存在
-        database = path.join(database, 'sis001-downloadwer-data');
-        if (!fs.existsSync(database)) {
-          await mkdir(database);
-        }
-      }
+      database = await getDataFolderPath(ctx);
       database = path.join(database, 'database.sqlite');
     }
 		return database;
@@ -50,7 +57,10 @@ const parseACGList = async (ctx: ExtensionContext, startPage = 1) => {
 };
 
 const generatePosts = async (ctx: ExtensionContext) => {
-  window.showInformationMessage('⚙️ 开始生成帖子！');  
+  window.showInformationMessage('⚙️ 开始生成帖子！'); 
+  const { connection } = await prepareConnection(await getDBPath(ctx));
+  await initDriver(ctx);
+  await createPosts(connection);
 };
 
 const Commands = {
@@ -64,4 +74,5 @@ export {
   parseACGList,
   Commands,
   generatePosts,
+  getDataFolderPath,
 }
