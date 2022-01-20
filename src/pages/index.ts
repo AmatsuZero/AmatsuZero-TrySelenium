@@ -83,58 +83,8 @@ tags:`;
   return size;
 }
 
-// eslint-disable-next-line max-params
-const download = async (driver:drive_v3.Drive, url: string, idx: number, folderId: string) => {
-  const resp = await _download(url);
-  if (resp === undefined) {
-    throw new Error("下载失败");
-  }
-  const name = `${idx}${path.extname(url)}`;
-  return save(driver, resp, name, folderId);
-};
-
-const _download = async (url: string, retries = 3) => {
-  return await retry(async (bail) => {
-    const res = await axios({
-      url,
-      responseType: 'stream',
-      insecureHTTPParser: true,
-    });
-    if (res.status === 403) {
-      // don't retry upon 403
-      bail(new Error('Unauthorized'));
-      return;
-    }
-    return res;
-  }, {retries, onRetry: (e, attemp)=> {
-    Logger.error(e);
-  }})
-}
-
-// eslint-disable-next-line max-params
-const save = async (driver:drive_v3.Drive, response:AxiosResponse, name: string, folderId: string) => {
-  const params = createUploadFileMetaData(response, name, folderId);
-  await uploadLoadImage(driver, params);
-}
-
-const downloadAssets = async (driver:drive_v3.Drive, model: InfoModel) => {
-  // 创建文件夹
-  const assetsDir = await createFolder(driver, `${model.threadId}`);
-  if (!assetsDir || assetsDir.length === 0) {
-    throw new Error(`创建文件夹失败：${model.threadId}`);
-  }
-  let idx = 0;
-  for (const pic of model.thumbnails) {
-    await download(driver, pic, idx, assetsDir);
-    idx += 1;
-  }
-  const dest = path.join(assetsDir, `${model.postId}.torrent`);
-  await download(driver, model.torrentLink, 0, dest);
-  return assetsDir;
-}
-
 // https://pengzhenghao.github.io/blog/2018/03/19/20180319bug2/
-  // https://chrischen0405.github.io/2018/11/21/post20181121-2/
+// https://chrischen0405.github.io/2018/11/21/post20181121-2/
 const handleTile = (originalTitle: string) => {
   let title = originalTitle.replace(":", ":&ensp");
   title = title.replace("[", "【");
@@ -167,73 +117,143 @@ tags:`;
   return stat.size;
 };
 
-const createNovelPosts = async (repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
-  const entities = await repo.find({category: "novel"});
-  let triggerSize = 0;
-  for (const entity of entities) {
-    if (ids.has(`${entity.threadId}`) || entity.isPosted) {
-      continue;
-    }
-    triggerSize += await writeNovel(entity);
-    Logger.log(`新小说帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
-    if (triggerSize >= TriggerSize) {
-      await hexo.call('clean');
-      await hexo.call('deploy', {_ :["-g"]});
-      Logger.log(`生成接近 100MB，部署完成🍺`);
-      triggerSize = 0;
-    }
-  }
-  if (triggerSize !== 0) {
-    await hexo.call('clean');
-    await hexo.call('deploy', {_ :["-g"]});
-  }
-};
+class PostsCreator {
+  public hexo: Hexo;
+  private driver: drive_v3.Drive;
+  private repo: Repository<InfoModel>;
+  private ids: Set<String>
 
-// eslint-disable-next-line max-params
-const createNewListPosts = async (driver:drive_v3.Drive, repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
-  const entities = await repo.find({category: "new"});
-  let triggerSize = 0;
-  for (const entity of entities) {
-    if (ids.has(`${entity.threadId}`) || entity.isPosted) {
-      continue;
-    }
-    const assetDir = await downloadAssets(driver, entity);
-    triggerSize += await writeContent(entity, assetDir);
-    Logger.log(`新作品帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
-    if (triggerSize >= TriggerSize) {
-      await hexo.call('clean');
-      await hexo.call('deploy', {_ :["-g"]});
-      Logger.log(`生成接近 100MB，部署完成🍺`);
-      triggerSize = 0;
-    }
+  public constructor(driver: drive_v3.Drive, connection: Connection) {
+    this.driver = driver;
+    this.hexo = new Hexo(hexoDir, {
+      debug: process.env.NODE_ENV === 'DEBUG',
+      config: path.join(hexoDir, '_config.yml')
+    });
+    this.repo = connection.getRepository(InfoModel);
+    this.ids = new Set();
   }
-  if (triggerSize !== 0) {
-    await hexo.call('clean');
-    await hexo.call('deploy', {_ :["-g"]});
-  }
-};
 
-export async function createPosts(connection:Connection, driver:drive_v3.Drive) {
-  const repo = connection.getRepository(InfoModel);
-  const hexo = new Hexo(hexoDir, {
-    debug: process.env.NODE_ENV === 'DEBUG',
-    config: path.join(hexoDir, '_config.yml')
-  });
-  try {
-    await hexo.init();
-    if (process.env.checkIsPosted !== undefined) {
-      await checkPosts(repo, hexo);
-      return;
-    }
+  public async hexoInit() {
     let postsList = await promises.readdir(postDir);
     postsList = postsList.filter(post => path.extname(post) === '.md');
     postsList = postsList.map(filename => filename.split('.').slice(0, -1).join('.'));
-    const ids = new Set(postsList);
-    await createNewListPosts(driver, repo, ids, hexo);
-    await createNovelPosts(repo, ids, hexo);
+    this.ids = new Set(postsList);
+    await this.hexo.init();
+  }
+
+  public async checkPosts() {
+    await checkPosts(this.repo, this.hexo);
+  }
+
+  public async createNewListPosts() {
+    const entities = await this.repo.find({ category: "new" });
+    let triggerSize = 0;
+    for (const entity of entities) {
+      if (this.ids.has(`${entity.threadId}`) || entity.isPosted) {
+        continue;
+      }
+      const assetDir = await this.downloadAssets(entity);
+      triggerSize += await writeContent(entity, assetDir);
+      Logger.log(`新作品帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
+      if (triggerSize >= TriggerSize) {
+        await this.hexo.call('clean');
+        await this.hexo.call('deploy', { _: ["-g"] });
+        Logger.log(`生成接近 100MB，部署完成🍺`);
+        triggerSize = 0;
+      }
+    }
+    if (triggerSize !== 0) {
+      await this.hexo.call('clean');
+      await this.hexo.call('deploy', { _: ["-g"] });
+    }
+  }
+
+  public async createNovelPosts() {
+    const entities = await this.repo.find({ category: "novel" });
+    let triggerSize = 0;
+    for (const entity of entities) {
+      if (this.ids.has(`${entity.threadId}`) || entity.isPosted) {
+        continue;
+      }
+      triggerSize += await writeNovel(entity);
+      Logger.log(`新小说帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
+      if (triggerSize >= TriggerSize) {
+        await this.hexo.call('clean');
+        await this.hexo.call('deploy', { _: ["-g"] });
+        Logger.log(`生成接近 100MB，部署完成🍺`);
+        triggerSize = 0;
+      }
+    }
+    if (triggerSize !== 0) {
+      await this.hexo.call('clean');
+      await this.hexo.call('deploy', { _: ["-g"] });
+    }
+  }
+
+  private async download(url: string, idx: number, folderId: string) {
+    const resp = await this._download(url);
+    if (resp === undefined) {
+      throw new Error("下载失败");
+    }
+    const name = `${idx}${path.extname(url)}`;
+    return this.save(resp, name, folderId);
+  }
+
+  private async _download(url: string, retries = 3) {
+    return await retry(async (bail) => {
+      const res = await axios({
+        url,
+        responseType: 'stream',
+        insecureHTTPParser: true,
+      });
+      if (res.status === 403) {
+        // don't retry upon 403
+        bail(new Error('Unauthorized'));
+        return;
+      }
+      return res;
+    }, {
+      retries, onRetry: (e, attemp) => {
+        Logger.error(e);
+      }
+    })
+  }
+
+  private async save(response: AxiosResponse, name: string, folderId: string) {
+    const params = createUploadFileMetaData(response, name, folderId);
+    await uploadLoadImage(this.driver, params);
+  }
+
+  private async downloadAssets(model: InfoModel) {
+    // 创建文件夹
+    const assetsDir = await createFolder(this.driver, `${model.threadId}`);
+    if (!assetsDir || assetsDir.length === 0) {
+      throw new Error(`创建文件夹失败：${model.threadId}`);
+    }
+    let idx = 0;
+    for (const pic of model.thumbnails) {
+      await this.download(pic, idx, assetsDir);
+      idx += 1;
+    }
+    const dest = path.join(assetsDir, `${model.postId}.torrent`);
+    await this.download(model.torrentLink, 0, dest);
+    return assetsDir;
+  }
+}
+
+export async function createPosts(connection: Connection, driver: drive_v3.Drive) {
+  const creator = new PostsCreator(driver, connection);
+  await creator.hexoInit();
+  try {
+    if (process.env.checkIsPosted !== undefined) {
+      await creator.checkPosts();
+      return;
+    }
+    await creator.createNewListPosts();
+    await creator.createNovelPosts();
   } catch (e) {
     Logger.error(e);
   } finally {
-    await hexo.exit();
+    await creator.hexo.exit();
   }
 }
