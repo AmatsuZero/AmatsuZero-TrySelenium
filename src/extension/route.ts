@@ -6,6 +6,7 @@ import { Logger, prepareConnection } from '../util';
 import { parseNewListPage, parseACGListPage } from '../route';
 import { createPosts } from '../pages';
 import { initDriver } from './google';
+import { Connection } from 'typeorm';
 
 const mkdir = promisify(fs.mkdir);
 
@@ -59,8 +60,16 @@ const parseACGList = async (ctx: ExtensionContext, startPage = 1) => {
 const generatePosts = async (ctx: ExtensionContext) => {
   window.showInformationMessage('⚙️ 开始生成帖子！'); 
   const { connection } = await prepareConnection(await getDBPath(ctx));
-  await initDriver(ctx);
-  await createPosts(connection);
+  try {
+    await initDriver(ctx);
+    await createPosts(connection);
+  } catch(e) {
+    window.showErrorMessage("❌ 创建帖子出错");
+    Logger.error(e);
+  } finally {
+    await connection.close();
+  }
+
 };
 
 const Commands = {

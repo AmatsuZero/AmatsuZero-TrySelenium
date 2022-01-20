@@ -7,7 +7,8 @@ import { Connection, Repository } from 'typeorm';
 import { InfoModel } from '../entity/info';
 import { Logger } from '../util';
 import { checkPosts } from './check';
-import { createFolder, createUploadFileMetaData, GetGoogleDriver, uploadLoadImage } from './google';
+import { createFolder, createUploadFileMetaData, uploadLoadImage } from './google';
+import { drive_v3 } from 'googleapis';
 
 const hexoDir = path.join(__dirname, '../..', 'hexo');
 const postDir = path.join(hexoDir, 'source/_posts');
@@ -82,13 +83,14 @@ tags:`;
   return size;
 }
 
-const download = async (url: string, idx: number, folderId: string) => {
+// eslint-disable-next-line max-params
+const download = async (driver:drive_v3.Drive, url: string, idx: number, folderId: string) => {
   const resp = await _download(url);
   if (resp === undefined) {
     throw new Error("下载失败");
   }
   const name = `${idx}${path.extname(url)}`;
-  return save(resp, name, folderId);
+  return save(driver, resp, name, folderId);
 };
 
 const _download = async (url: string, retries = 3) => {
@@ -109,26 +111,25 @@ const _download = async (url: string, retries = 3) => {
   }})
 }
 
-const save = async (response:AxiosResponse, name: string, folderId: string) => {
-  const driver = GetGoogleDriver();
+// eslint-disable-next-line max-params
+const save = async (driver:drive_v3.Drive, response:AxiosResponse, name: string, folderId: string) => {
   const params = createUploadFileMetaData(response, name, folderId);
   await uploadLoadImage(driver, params);
 }
 
-const downloadAssets = async (model: InfoModel) => {
+const downloadAssets = async (driver:drive_v3.Drive, model: InfoModel) => {
   // 创建文件夹
-  const driver = GetGoogleDriver();
   const assetsDir = await createFolder(driver, `${model.threadId}`);
   if (!assetsDir || assetsDir.length === 0) {
     throw new Error(`创建文件夹失败：${model.threadId}`);
   }
   let idx = 0;
   for (const pic of model.thumbnails) {
-    await download(pic, idx, assetsDir);
+    await download(driver, pic, idx, assetsDir);
     idx += 1;
   }
   const dest = path.join(assetsDir, `${model.postId}.torrent`);
-  await download(model.torrentLink, 0, dest);
+  await download(driver, model.torrentLink, 0, dest);
   return assetsDir;
 }
 
@@ -188,14 +189,15 @@ const createNovelPosts = async (repo: Repository<InfoModel>, ids: Set<string>, h
   }
 };
 
-const createNewListPosts = async (repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
+// eslint-disable-next-line max-params
+const createNewListPosts = async (driver:drive_v3.Drive, repo: Repository<InfoModel>, ids: Set<string>, hexo: Hexo) => {
   const entities = await repo.find({category: "new"});
   let triggerSize = 0;
   for (const entity of entities) {
     if (ids.has(`${entity.threadId}`) || entity.isPosted) {
       continue;
     }
-    const assetDir = await downloadAssets(entity);
+    const assetDir = await downloadAssets(driver, entity);
     triggerSize += await writeContent(entity, assetDir);
     Logger.log(`新作品帖子 ${entity.threadId}.md 生成完毕🎉  准备部署……`);
     if (triggerSize >= TriggerSize) {
@@ -211,7 +213,7 @@ const createNewListPosts = async (repo: Repository<InfoModel>, ids: Set<string>,
   }
 };
 
-export async function createPosts(connection:Connection) {
+export async function createPosts(connection:Connection, driver:drive_v3.Drive) {
   const repo = connection.getRepository(InfoModel);
   const hexo = new Hexo(hexoDir, {
     debug: process.env.NODE_ENV === 'DEBUG',
@@ -227,7 +229,7 @@ export async function createPosts(connection:Connection) {
     postsList = postsList.filter(post => path.extname(post) === '.md');
     postsList = postsList.map(filename => filename.split('.').slice(0, -1).join('.'));
     const ids = new Set(postsList);
-    await createNewListPosts(repo, ids, hexo);
+    await createNewListPosts(driver, repo, ids, hexo);
     await createNovelPosts(repo, ids, hexo);
   } catch (e) {
     Logger.error(e);

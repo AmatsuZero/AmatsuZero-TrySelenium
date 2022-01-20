@@ -6,27 +6,31 @@ import readline from 'readline';
 import { exec } from 'child_process';
 import { Logger } from '../util';
 import { AxiosResponse } from 'axios';
+import { oauth2 } from 'googleapis/build/src/apis/oauth2';
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 
+interface OAuthCredentialObject {
+  client_id: string,
+  project_id: string,
+  auth_uri: string,
+  token_uri: string,
+  auth_provider_x509_cert_url: string,
+  client_secret: string,
+  redirect_uris: string[]
+}
+
 interface OAuthCredentials {
-  installed: {
-    client_id: string,
-    project_id: string,
-    auth_uri: string,
-    token_uri: string,
-    auth_provider_x509_cert_url: string,
-    client_secret: string,
-    redirect_uris: string[]
-  }
+  installed: OAuthCredentialObject
+  web: OAuthCredentialObject
 }
 
 const authorize = async (credentials: OAuthCredentials, tokenPath: string, 
   getAccessToken: (client: OAuth2Client) => Promise<Credentials>) => {
   const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Clinet = new google.auth.OAuth2(
-    client_id, client_secret, redirect_uris[0]
+      client_id, client_secret, redirect_uris[0]
   );
   if (existsSync(tokenPath)) {
     const token = await fs.readFile(tokenPath, 'utf-8');
@@ -78,23 +82,12 @@ const getAccessTokenNTerminal = (oAuth2Clinet: OAuth2Client, tokenPath: string) 
   });
 });
 
-let _driver: drive_v3.Drive | null;
 const InitDriver = async (credentilaPath: string, tokenPath: string, getAccessToken: (client: OAuth2Client) => Promise<Credentials>) => {
-  if (_driver !== null) {
-    return _driver;
-  }
   const content = await fs.readFile(credentilaPath, 'utf8');
   const credentilas = JSON.parse(content) as OAuthCredentials;
   const auth = await authorize(credentilas, tokenPath, getAccessToken);
-  _driver = google.drive({version: 'v3', auth});
-  return _driver;
-};
-
-const GetGoogleDriver = () => {
-  if (_driver === null) {
-    throw new Error("请先初始化！！！");
-  }
-  return _driver;
+  const driver = google.drive({version: 'v3', auth});
+  return driver;
 };
 
 const persistenceOfToken = async (tokenPath: string, tokens: Credentials) => {
@@ -141,6 +134,6 @@ export {
   getAccessTokenNTerminal,
   createFolder,
   uploadLoadImage,
-  GetGoogleDriver,
-  createUploadFileMetaData
+  createUploadFileMetaData,
+  OAuthCredentials,
 }

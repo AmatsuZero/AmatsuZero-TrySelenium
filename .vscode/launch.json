@@ -76,7 +76,10 @@
       "program": "${workspaceFolder}/src/server/index.ts",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "restart": true
+      "restart": true,
+      "env":{
+        "NODE_ENV": "DEBUG"
+      },
     },
   ]
 }
