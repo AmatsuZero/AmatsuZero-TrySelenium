@@ -1,22 +1,16 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { OAuth2Client, Credentials } from 'google-auth-library';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
-import { Connection } from 'typeorm';
-import { InfoModel } from '../entity/info';
-import { InitDriver, OAuthCredentials, persistenceOfToken } from '../pages/google';
-import { parseNewListPage } from '../route';
+import { GoogleDriver } from '../pages/google';
 import { createLogger, Logger, prepareConnection } from '../util';
-import { google } from 'googleapis';
+import dotenv from "dotenv";
 
 const hostname = 'localhost';
 const port = 3000;
 const app = express();
-const dataDir = path.join(__dirname, '../..', 'data');
-const credentialPath = path.join(dataDir, 'credentials.json');
-const tokenPath = path.join(dataDir, 'gdToken');
+const GDDRIVER_KEY = "gdDriver";
 
 const loggingMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const time = new Date();
@@ -44,28 +38,30 @@ app.get("/parse", async (req, res) => {
   
 });
 
-let _oauth2: OAuth2Client;
-
 app.get('/oauth2', async (req, res) => {
   const code = req.query.code as string;
-  if (_oauth2 === undefined) {
-    const content = await fs.readFile(credentialPath, 'utf8');
-    const credentials = JSON.parse(content) as OAuthCredentials;
-    const { client_secret, client_id, redirect_uris } = credentials.web;
-    _oauth2 = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]
-    );
+  const redirectUrl = req.query.redirectUrl as string;
+  const driver = app.get(GDDRIVER_KEY) as GoogleDriver;
+  if (driver === undefined) {
+    res.status(500).send("Google Drive 初始化失败");
+    return;
   }
-  const oAuth2Clinet = _oauth2;
-  if (existsSync(tokenPath)) {
-    const token = await fs.readFile(tokenPath, 'utf-8');
-    res.redirect(`/posts?credentials=${token}`);
+  if (driver.isAuthoried) {
+    res.status(200).send("认证成功");
+    return;
+  }
+  const oAuth2Clinet = driver.oAuth2Clinet;
+  if (existsSync(driver.tokenPath)) {
+    const token = await fs.readFile(driver.tokenPath, 'utf-8');
+    const cred = JSON.parse(token);
+    driver.webInit(cred);
+    res.redirect(redirectUrl);
   } else if (code !== undefined && code.length > 0) {
     try {
       const response = await oAuth2Clinet.getToken(code);
-      await persistenceOfToken(tokenPath, response.tokens)
-      const token = JSON.stringify(response.tokens);
-      res.redirect(`/posts?credentials=${token}`);
+      await driver.persistenceOfToken(response.tokens);
+      driver.webInit(response.tokens);
+      res.redirect(redirectUrl);
     } catch (e) {
       res.send(e);
     }
@@ -80,18 +76,31 @@ app.get('/oauth2', async (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {  
-  const credentials = req.query.credentials as string;
-  if (credentials !== undefined && credentials.length > 0) {
-    const token = JSON.parse(credentials) as Credentials;
-    _oauth2.setCredentials(token);
-    const drive = google.drive({version: 'v3', auth: _oauth2});
+  const driver = app.get(GDDRIVER_KEY) as GoogleDriver;
+  if (driver === undefined) {
+    res.status(500).send("Google Drive 初始化失败");
+    return;
+  }
+  if (driver.isAuthoried) {
     res.send('success');
   } else {
-    res.redirect("/oauth2")
+    res.redirect("/oauth2?redirectUrl=/posts");
   }
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
+  // 加载环境变量
+  dotenv.config();
   createLogger();
+  try {
+    const tokenPath = process.env.TOKEN_PATH || "";
+    const credentialPath = process.env.CREDENTIAL_PATH || "";
+    const token = await fs.readFile(credentialPath, 'utf-8');
+    const cred = JSON.parse(token).web;
+    const driver = new GoogleDriver(tokenPath, cred);
+    app.set(GDDRIVER_KEY, driver);
+  } catch (e) {
+    Logger.error(e);
+  }
   Logger.log(`Server running at http://${hostname}:${port}/`);
 });

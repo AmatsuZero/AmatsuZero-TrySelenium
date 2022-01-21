@@ -3,11 +3,13 @@ import { resume, specifiedPages, parseNewListPage, updateNewTags, parseACGListPa
 import { nameExtraction } from './name_extraction';
 import { Connection } from 'typeorm';
 import { createPosts } from './pages';
+import fs from 'fs/promises';
+import { GoogleDriver } from './pages/google';
 
 (async () => {
   let conn: Connection | null | undefined;
   try {
-    const { startpage, pages, isResume, isUpdateTags, isUpdateNames, isHexo } = await parseInitArgs();
+    const { startpage, pages, isResume, isUpdateTags, isUpdateNames, isHexo, CREDENTIAL_PATH, TOKEN_PATH } = await parseInitArgs();
     Logger.log(`🚀 启动任务：${new Date().toLocaleString('zh-CN')}`);
     const { connection, hasHistoryData } = await prepareConnection();
     conn = connection;
@@ -20,8 +22,14 @@ import { createPosts } from './pages';
     } else if (pages.length > 0) {
       await specifiedPages(connection, pages);
     } else if (isHexo) {
-      await createPosts(connection);
-    } else {    
+      const token = await fs.readFile(CREDENTIAL_PATH, 'utf-8');
+      const cred = JSON.parse(token);
+      const driver = new GoogleDriver(TOKEN_PATH, cred);
+      await driver.authorize((driver) => {
+        return driver.getAccessTokenNTerminal();
+      });
+      await createPosts(connection, driver);
+    } else {
       await parseNewListPage(connection, startpage, hasHistoryData);
       await parseNoveListPage(connection, startpage, hasHistoryData);
       await parseACGListPage(connection, startpage, hasHistoryData);

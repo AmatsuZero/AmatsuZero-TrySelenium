@@ -61,8 +61,8 @@ const generatePosts = async (ctx: ExtensionContext) => {
   window.showInformationMessage('⚙️ 开始生成帖子！'); 
   const { connection } = await prepareConnection(await getDBPath(ctx));
   try {
-    await initDriver(ctx);
-    await createPosts(connection);
+    const driver = await initDriver(ctx);
+    await createPosts(connection, driver);
   } catch(e) {
     window.showErrorMessage("❌ 创建帖子出错");
     Logger.error(e);

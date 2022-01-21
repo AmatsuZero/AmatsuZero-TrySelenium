@@ -14,7 +14,6 @@ import os from 'os';
 import { Console } from 'console';
 import process from 'process';
 import { createInterface } from 'readline';
-import dotenv from "dotenv";
 import { createConnection } from "typeorm";
 import { ThreadInfo } from './newlist';
 import axios from 'axios';
@@ -22,9 +21,6 @@ import cheerio from "cheerio";
 
 const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
-
-// 加载环境变量
-dotenv.config();
 
 const PageCode = {
   NEW: 'forum-561',
@@ -172,6 +168,8 @@ const parseInitArgs = async () => {
   let isUpdateTags = false;
   let isUpdateNames = false;
   let isHexo = false;
+  let TOKEN_PATH = "";
+  let CREDENTIAL_PATH = "";
   // 检查起始页码
   for (const arg of process.argv) {
     if (arg.startsWith("--page")) {
@@ -195,10 +193,14 @@ const parseInitArgs = async () => {
       process.env.checkIsPosted = "true";
     } else if (arg.startsWith("--useTrySelenium")) {
       process.env.useTrySelenium = "true";
+    } else if (arg.startsWith("--tokenPath")) {
+      TOKEN_PATH = arg.split("=")[1];
+    } else if (arg.startsWith("--credentailPath")) {
+      CREDENTIAL_PATH = arg.split("=")[1];
     }
   }
   createLogger(defaultLogPath);
-  return { startpage, pages, isResume, isUpdateTags, isUpdateNames, isHexo };
+  return { startpage, pages, isResume, isUpdateTags, isUpdateNames, isHexo, TOKEN_PATH, CREDENTIAL_PATH };
 };
 
 const createLogger = (log?: string) => {

@@ -7,8 +7,7 @@ import { Connection, Repository } from 'typeorm';
 import { InfoModel } from '../entity/info';
 import { Logger } from '../util';
 import { checkPosts } from './check';
-import { createFolder, createUploadFileMetaData, uploadLoadImage } from './google';
-import { drive_v3 } from 'googleapis';
+import { GoogleDriver } from './google';
 
 const hexoDir = path.join(__dirname, '../..', 'hexo');
 const postDir = path.join(hexoDir, 'source/_posts');
@@ -119,11 +118,11 @@ tags:`;
 
 class PostsCreator {
   public hexo: Hexo;
-  private driver: drive_v3.Drive;
+  private driver: GoogleDriver;
   private repo: Repository<InfoModel>;
   private ids: Set<String>
 
-  public constructor(driver: drive_v3.Drive, connection: Connection) {
+  public constructor(driver: GoogleDriver, connection: Connection) {
     this.driver = driver;
     this.hexo = new Hexo(hexoDir, {
       debug: process.env.NODE_ENV === 'DEBUG',
@@ -220,13 +219,13 @@ class PostsCreator {
   }
 
   private async save(response: AxiosResponse, name: string, folderId: string) {
-    const params = createUploadFileMetaData(response, name, folderId);
-    await uploadLoadImage(this.driver, params);
+    const params = this.driver.createUploadFileMetaData(response, name, folderId);
+    await this.driver.uploadLoadImage(params);
   }
 
   private async downloadAssets(model: InfoModel) {
     // 创建文件夹
-    const assetsDir = await createFolder(this.driver, `${model.threadId}`);
+    const assetsDir = await this.driver.createFolder(`${model.threadId}`);
     if (!assetsDir || assetsDir.length === 0) {
       throw new Error(`创建文件夹失败：${model.threadId}`);
     }
@@ -241,7 +240,7 @@ class PostsCreator {
   }
 }
 
-export async function createPosts(connection: Connection, driver: drive_v3.Drive) {
+export async function createPosts(connection: Connection, driver: GoogleDriver) {
   const creator = new PostsCreator(driver, connection);
   await creator.hexoInit();
   try {

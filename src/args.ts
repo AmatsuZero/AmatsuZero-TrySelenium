@@ -1,14 +1,9 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { createPosts } from './pages';
-import { prepareConnection } from './util';
 
 yargs(hideBin(process.argv))
   .command('hexo', '生成 hexo 博客', yargs => {
     return yargs
-  }, async (argv) => {
-    const { connection } = await prepareConnection();
-    await createPosts(connection);
   })
   .command('resume', '恢复爬虫', yargs => {
     return yargs 
