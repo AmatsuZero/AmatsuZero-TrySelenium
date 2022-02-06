@@ -19,7 +19,7 @@ import { ThreadInfo } from './newlist';
 import axios from 'axios';
 import cheerio from "cheerio";
 
-const expectedTitle = 'SiS001! Board - [第一会所 邀请注册]';
+const expectedTitle = 'SiS001! Board - [第一会所 開放注册]';
 const defaultLogPath = path.join(__dirname, '..', 'log.txt');
 
 const PageCode = {
