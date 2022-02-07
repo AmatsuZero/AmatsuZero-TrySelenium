@@ -1,0 +1,5 @@
+package aria
+
+func ServiceAria() {
+
+}

@@ -58,7 +58,7 @@ func GetWindowsVersion() (version string) {
 	buffer.ReadFrom(out)
 	str, _ := buffer.ReadString(']')
 	cmd.Wait()
-	for key, _ := range versionNumbers {
+	for key := range versionNumbers {
 		re := regexp.MustCompile(`Microsoft Windows \[[\s\S]* ` + key + `\.([0-9]+).?[0-9]*\]`)
 		if re.MatchString(str) {
 			if versionNumbers[key] != "10" {

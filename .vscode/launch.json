@@ -85,7 +85,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${fileDirname}/aria.go",
+      "program": "${workspaceFolder}/aria.go",
       "env": {},
       "args": []
     }

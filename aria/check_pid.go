@@ -1,6 +1,9 @@
 package aria
 
-import "os/exec"
+import (
+	"os/exec"
+	"strings"
+)
 
 func CheckPid() (pid string) {
 	cmd := exec.Command("ps", "-ef")
@@ -8,6 +11,13 @@ func CheckPid() (pid string) {
 		panic(err)
 	} else {
 		pid = string(output)
+		lines := strings.Split(pid, "\n")
+		for _, line := range lines {
+			index := strings.Index(line, "aria2c")
+			if index != -1 {
+				pid = line
+			}
+		}
 	}
 	return
 }

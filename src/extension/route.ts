@@ -6,7 +6,6 @@ import { Logger, prepareConnection } from '../util';
 import { parseNewListPage, parseACGListPage } from '../route';
 import { createPosts } from '../pages';
 import { initDriver } from './google';
-import { Connection } from 'typeorm';
 
 const mkdir = promisify(fs.mkdir);
 
