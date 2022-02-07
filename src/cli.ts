@@ -31,9 +31,9 @@ import { GoogleDriver } from './pages/google';
       await createPosts(connection, driver);
     } else {
       await parseNewListPage(connection, startpage, hasHistoryData);
-      await parseNoveListPage(connection, startpage, hasHistoryData);
-      await parseACGListPage(connection, startpage, hasHistoryData);
       await parseWesternListPage(connection, startpage, hasHistoryData);
+      await parseACGListPage(connection, startpage, hasHistoryData);
+          // await parseNoveListPage(connection, startpage, hasHistoryData);
     }
   } catch (e) {
     Logger.log('❌ 好吧，我也不知道这里出了什么错');

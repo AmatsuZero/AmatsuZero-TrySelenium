@@ -3,8 +3,7 @@ import { NewListPage, ThreadInfo } from './newlist';
 import DetailPage from './detail';
 import { InfoModel } from "./entity/info";
 import { findAvailableHost, Logger, ShouldCountinue } from './util';
-import ACGList from './acglist';
-import ACGDetailPage from './acgdetail';
+import { ACGList, ACGDetailPage } from './acg';
 import { NovelDetail, NovelList } from './novellist';
 import { WesternDetail, WesternList } from './western';
 

@@ -3,10 +3,14 @@ import DetailPage from './detail';
 import { By, WebElement } from 'selenium-webdriver';
 import { InfoModel } from './entity/info';
 import { NewListPage, ThreadInfo } from "./newlist";
-import { Logger, makeBrowser, PageCode, SISPaths, getThreadId, ShouldCountinue } from "./util";
+import { Logger, makeBrowser, PageCode, SISPaths } from "./util";
 
 export class NovelDetail extends DetailPage {
   public async extractInfo() {
+    if (!process.env.useTrySelenium) {
+      return super.extractInfo();
+    }
+
     const driver = await makeBrowser();
     try {
       await driver.get(this.href);

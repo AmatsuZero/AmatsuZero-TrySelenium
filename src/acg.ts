@@ -1,10 +1,39 @@
-import { By } from "selenium-webdriver";
-import DetailPage from "./detail";
-import { InfoModel } from "./entity/info";
-import { makeBrowser } from "./util";
+import { By } from 'selenium-webdriver';
+import { URL } from 'url';
+import DetailPage from './detail';
+import { InfoModel } from './entity/info';
+import { NewListPage } from "./newlist";
+import { makeBrowser, PageCode, SISPaths } from "./util";
 
-export default class ACGDetailPage extends DetailPage {
+export class ACGList extends NewListPage {
+  protected currentPageURL(): string {
+    const path = `${SISPaths.ACG}-${this.currentPage}.html`;
+    return new URL(path, this.host).href;
+  }
+
+  protected pathReplacement(): string {
+    return PageCode.ACG;
+  }
+
+  protected title() {
+    return "ACG";
+  }
+
+  protected category() {
+    return "acg";
+  }
+
+  protected maxPageSelector() {
+    return "#wrapper > div:nth-child(1) > div:nth-child(10) > div > a.last";
+  }
+}
+
+export class ACGDetailPage extends DetailPage {
   public async extractInfo() {
+    if (!process.env.useTrySelenium) {
+      return super.extractInfo();
+    }
+
     const driver = await makeBrowser();
     try {
       await driver.get(this.href);
