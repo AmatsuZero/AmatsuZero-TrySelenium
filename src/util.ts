@@ -47,7 +47,11 @@ const hosts = [
   "http://68.168.16.150/",
   "http://68.168.16.151/",
   "http://68.168.16.153/",
-  "http://68.168.16.154/"
+  "http://68.168.16.154/",
+  "http://23.225.255.95/",
+  "http://23.225.255.96/",
+  "https://pux.sisurl.com/",
+  "http://23.225.172.96/"
 ];
 
 let serviceBuilder: ServiceBuilder | undefined;
@@ -111,7 +115,7 @@ const _cheerioFindAvailableHost = async () => {
       const bbs = new URL(SISPaths.INDEX, host)
       const res = await axios.get(bbs.href);
       const $ = cheerio.load(res.data);
-      if ($("title").text().replace("  ", " ").trim() === expectedTitle) {
+      if ($("title").text().replace("  ", " ").trim().includes("SiS001! Board -")) {
         return host;
       }
     }
