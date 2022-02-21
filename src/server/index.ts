@@ -6,11 +6,14 @@ import { existsSync } from 'fs';
 import { GoogleDriver } from '../pages/google';
 import { createLogger, Logger, prepareConnection } from '../util';
 import dotenv from "dotenv";
+import { createPosts } from '../pages';
+import { Connection } from 'typeorm/connection/Connection';
 
 const hostname = 'localhost';
 const port = 3000;
 const app = express();
 const GDDRIVER_KEY = "gdDriver";
+const DB_CONNECTION = "DB_CONNECTION";
 
 const loggingMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const time = new Date();
@@ -54,14 +57,14 @@ app.get('/oauth2', async (req, res) => {
   if (existsSync(driver.tokenPath)) {
     const token = await fs.readFile(driver.tokenPath, 'utf-8');
     const cred = JSON.parse(token);
-    driver.webInit(cred);
+    await driver.webInit(cred);
     res.redirect(redirectUrl);
   } else if (code !== undefined && code.length > 0) {
     try {
       const response = await oAuth2Clinet.getToken(code);
       await driver.persistenceOfToken(response.tokens);
       driver.webInit(response.tokens);
-      res.redirect(redirectUrl);
+      res.send("认证成功");
     } catch (e) {
       res.send(e);
     }
@@ -82,7 +85,8 @@ app.get("/posts", async (req, res) => {
     return;
   }
   if (driver.isAuthoried) {
-    res.send('success');
+    const conn = app.get(DB_CONNECTION) as Connection;
+    await createPosts(conn, driver);
   } else {
     res.redirect("/oauth2?redirectUrl=/posts");
   }
@@ -99,6 +103,9 @@ app.listen(port, async () => {
     const cred = JSON.parse(token).web;
     const driver = new GoogleDriver(tokenPath, cred);
     app.set(GDDRIVER_KEY, driver);
+
+    const { connection } = await prepareConnection();
+    app.set(DB_CONNECTION, connection);
   } catch (e) {
     Logger.error(e);
   }

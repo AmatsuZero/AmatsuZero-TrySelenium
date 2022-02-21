@@ -70,6 +70,11 @@ export class GoogleDriver {
 
   public async webInit(credentials: Credentials) {
     this.oAuth2Clinet.setCredentials(credentials);
+    const date = new Date();
+    if (credentials.expiry_date !== null && credentials.expiry_date !== undefined && date.getTime() >= credentials.expiry_date) {
+      const token = await this.oAuth2Clinet.getRequestHeaders();
+      Logger.log(token);
+    }
     this.driver = google.drive({ version: 'v3', auth: this.oAuth2Clinet });
     this.isAuthoried = true;
   }
