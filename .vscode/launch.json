@@ -88,6 +88,24 @@
       "program": "${workspaceFolder}/aria.go",
       "env": {},
       "args": []
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Hentai",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/dist/hentai.js",
+      "outFiles": [
+        "${workspaceFolder}/**/*.js"
+      ],
+      "env":{
+        "NODE_ENV": "DEBUG"
+      },
+      "args": [
+        "https://e-hentai.org/g/2212761/8368b5e7b3/"
+      ]
     }
   ]
 }
